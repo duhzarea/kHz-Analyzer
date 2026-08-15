@@ -28,6 +28,25 @@ public sealed class TrackRow
         var (key, bpm, faixa) = TrackNameParser.Parse(r.Arquivo);
         string formato = System.IO.Path.GetExtension(r.Arquivo).TrimStart('.').ToUpperInvariant();
 
+        if (r.Erro == "Arquivo na nuvem (não baixado)")
+        {
+            return new TrackRow
+            {
+                CaminhoCompleto = r.Arquivo,
+                Faixa = faixa,
+                Key = string.IsNullOrEmpty(key) ? "—" : key,
+                Bpm = string.IsNullOrEmpty(bpm) ? "—" : bpm,
+                Formato = formato,
+                SampleRate = "—",
+                Bits = "—",
+                FreqMax = "—",
+                Veredito = r.Erro,
+                StatusGlyph = "\uE753",
+                StatusBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 0x8B, 0x8B, 0x8B)),
+                Status = StatusFaixa.Offline,
+            };
+        }
+
         if (r.Erro is not null)
         {
             return new TrackRow
@@ -73,4 +92,5 @@ public enum StatusFaixa
     Ok,
     Abaixo,
     Erro,
+    Offline
 }

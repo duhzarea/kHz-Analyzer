@@ -55,9 +55,10 @@ public static class DocxReport
         int total = results.Count();
         int ok = results.Count(r => r.EhOk);
         int abaixo = results.Count(r => r.EhAbaixo);
-        int erros = total - ok - abaixo;
+        int offline = results.Count(r => r.Erro == "Arquivo na nuvem (não baixado)");
+        int erros = total - ok - abaixo - offline;
 
-        sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} faixas analisadas  ·  {ok} OK  ·  {abaixo} abaixo de 20kHz  ·  {erros} erros</w:t></w:r></w:p>");
+        sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} faixas analisadas  ·  {ok} OK  ·  {abaixo} abaixo de 20kHz  ·  {offline} offline  ·  {erros} erros</w:t></w:r></w:p>");
         sb.Append(@"<w:p/>"); // empty line
 
         // Table
@@ -109,7 +110,13 @@ public static class DocxReport
             string vColor = "000000";
             bool vBold = false;
             
-            if (r.Erro != null)
+            if (r.Erro == "Arquivo na nuvem (não baixado)")
+            {
+                vColor = "8B8B8B"; // Gray
+                vBold = false;
+                vereditoTxt = r.Erro;
+            }
+            else if (r.Erro != null)
             {
                 vColor = "D35400"; // Orange
                 vBold = true;

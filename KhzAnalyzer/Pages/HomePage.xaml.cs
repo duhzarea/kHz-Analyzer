@@ -8,8 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using KhzAnalyzer.Core;
 using KhzAnalyzer.Models;
+using KhzAnalyzer.Utils;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace KhzAnalyzer.Pages;
 
@@ -105,26 +107,79 @@ public sealed partial class HomePage : Page
     private async Task ExecutarAnaliseAsync(string pasta, CancellationToken token)
     {
         StatusText.Text = "Procurando arquivos…";
+        Logger.Log($"--- NOVA ANÁLISE ---");
+        Logger.Log($"Iniciando enumeração na pasta: {pasta}");
 
-        List<string> arquivos = await Task.Run(() =>
-            Directory.EnumerateFiles(pasta, "*.*", SearchOption.AllDirectories)
-                .Where(f => Extensoes.Contains(Path.GetExtension(f).ToLowerInvariant()))
-                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
-                .ToList(),
-            token);
+        var cronometroEnumeracao = Stopwatch.StartNew();
+        var arquivos = new List<string>();
+        var arquivosOffline = new List<string>();
 
-        int total = arquivos.Count;
+        var opcoes = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            IgnoreInaccessible = true,
+            AttributesToSkip = FileAttributes.System | FileAttributes.Temporary
+        };
+
+        await Task.Run(() =>
+        {
+            try
+            {
+                foreach (var arquivo in Directory.EnumerateFiles(pasta, "*.*", opcoes))
+                {
+                    token.ThrowIfCancellationRequested();
+                    string ext = Path.GetExtension(arquivo).ToLowerInvariant();
+                    if (Extensoes.Contains(ext))
+                    {
+                        if (File.GetAttributes(arquivo).HasFlag(FileAttributes.Offline))
+                        {
+                            arquivosOffline.Add(arquivo);
+                            continue;
+                        }
+
+                        arquivos.Add(arquivo);
+                        if (arquivos.Count % 100 == 0)
+                        {
+                            DispatcherQueue.TryEnqueue(() => 
+                                StatusText.Text = $"Procurando arquivos… ({arquivos.Count} encontrados)");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Erro durante enumeração: {ex}");
+                throw;
+            }
+        }, token);
+
+        arquivos.Sort(StringComparer.OrdinalIgnoreCase);
+        cronometroEnumeracao.Stop();
+        Logger.Log($"Enumeração concluída em {cronometroEnumeracao.Elapsed}. Válidos: {arquivos.Count}, Offline: {arquivosOffline.Count}");
+
+        int total = arquivos.Count + arquivosOffline.Count;
         if (total == 0)
         {
             StatusText.Text = "Nenhum arquivo .wav ou .aiff encontrado nessa pasta.";
             return;
         }
 
-        Progresso.Maximum = total;
-        Progresso.Value = 0;
+        // Adiciona os arquivos offline diretamente na tabela
+        foreach (var offline in arquivosOffline)
+        {
+            var erroResult = new AnalysisResult { Arquivo = offline, Erro = "Arquivo na nuvem (não baixado)" };
+            var erroLinha = TrackRow.FromResult(erroResult);
+            _todos.Add(erroLinha);
+            _resultadosRaw.Add(erroResult);
+            if (PassaNoFiltro(erroLinha)) _visiveis.Add(erroLinha);
+        }
 
-        var cronometro = Stopwatch.StartNew();
-        int processados = 0;
+        Progresso.Maximum = total;
+        Progresso.Value = arquivosOffline.Count;
+        AtualizarContadores();
+
+        var cronometroAnalise = Stopwatch.StartNew();
+        int processados = arquivosOffline.Count;
 
         // Paraleliza usando os núcleos disponíveis, deixando um livre para a interface.
         int workers = Math.Max(1, Environment.ProcessorCount - 1);
@@ -141,11 +196,14 @@ public sealed partial class HomePage : Page
                 try
                 {
                     token.ThrowIfCancellationRequested();
+                    Logger.Log($"[INICIO] {caminho}");
                     AnalysisResult resultado = SpectrumAnalyzer.Analisar(caminho);
-                    var linha = TrackRow.FromResult(resultado);
 
                     DispatcherQueue.TryEnqueue(() =>
                     {
+                        var linha = TrackRow.FromResult(resultado);
+                        Logger.Log($"[FIM] {caminho} - Status: {linha.Status}");
+                        
                         _todos.Add(linha);
                         _resultadosRaw.Add(resultado);
                         if (PassaNoFiltro(linha)) _visiveis.Add(linha);
@@ -153,7 +211,24 @@ public sealed partial class HomePage : Page
                         int feitos = Interlocked.Increment(ref processados);
                         Progresso.Value = feitos;
                         AtualizarContadores();
-                        AtualizarStatus(feitos, total, cronometro.Elapsed, linha.Faixa);
+                        AtualizarStatus(feitos, total, cronometroAnalise.Elapsed, linha.Faixa);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"[ERRO FATAL EM FAIXA] {caminho}: {ex}");
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        var erroResult = new AnalysisResult { Arquivo = caminho, Erro = ex.Message };
+                        var erroLinha = TrackRow.FromResult(erroResult);
+                        _todos.Add(erroLinha);
+                        _resultadosRaw.Add(erroResult);
+                        if (PassaNoFiltro(erroLinha)) _visiveis.Add(erroLinha);
+                        
+                        int feitos = Interlocked.Increment(ref processados);
+                        Progresso.Value = feitos;
+                        AtualizarContadores();
+                        AtualizarStatus(feitos, total, cronometroAnalise.Elapsed, erroLinha.Faixa);
                     });
                 }
                 finally
@@ -165,8 +240,11 @@ public sealed partial class HomePage : Page
 
         await Task.WhenAll(tarefas);
 
-        cronometro.Stop();
-        StatusText.Text = $"Concluído em {FormatarTempo(cronometro.Elapsed)} — {total} faixas analisadas.";
+        cronometroAnalise.Stop();
+        Logger.Log($"Análise concluída em {cronometroAnalise.Elapsed}. Total analisados: {total}");
+        
+        string avisoOffline = arquivosOffline.Count > 0 ? $" ({arquivosOffline.Count} offline pulados)" : "";
+        StatusText.Text = $"Concluído em {FormatarTempo(cronometroAnalise.Elapsed)} — {total} faixas analisadas{avisoOffline}.";
     }
 
     private void AtualizarStatus(int feitos, int total, TimeSpan decorrido, string faixaAtual)
@@ -193,6 +271,7 @@ public sealed partial class HomePage : Page
         OkText.Text = _todos.Count(r => r.Status == StatusFaixa.Ok).ToString();
         AbaixoText.Text = _todos.Count(r => r.Status == StatusFaixa.Abaixo).ToString();
         ErroText.Text = _todos.Count(r => r.Status == StatusFaixa.Erro).ToString();
+        OfflineText.Text = _todos.Count(r => r.Status == StatusFaixa.Offline).ToString();
     }
 
     // ---------------------------------------------------- Filtros/busca --

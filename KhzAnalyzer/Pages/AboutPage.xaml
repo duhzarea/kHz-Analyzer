@@ -13,7 +13,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="About" />
-        <TextBlock Grid.Row="1" Text="This is the About page" />
+        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Sobre" />
+        
+        <StackPanel Grid.Row="1" Spacing="16">
+            <TextBlock Text="kHz Analyzer - Verificador de espectro de áudio" />
+            <Button Content="Abrir pasta de logs" Click="AbrirLogs_Click" />
+        </StackPanel>
     </Grid>
 </Page>

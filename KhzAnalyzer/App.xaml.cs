@@ -4,6 +4,9 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System.Threading.Tasks;
+using System;
+using KhzAnalyzer.Utils;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,6 +27,27 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        
+        this.UnhandledException += App_UnhandledException;
+        TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+    }
+
+    private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        Logger.Log($"UI Unhandled Exception: {e.Exception}");
+        e.Handled = false; // Fail fast após o log, não engole o erro
+    }
+
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        Logger.Log($"Task Unobserved Exception: {e.Exception}");
+        e.SetObserved();
+    }
+
+    private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+    {
+        Logger.Log($"AppDomain Unhandled Exception: {e.ExceptionObject}");
     }
 
     /// <summary>

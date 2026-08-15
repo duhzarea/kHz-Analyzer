@@ -11,4 +11,20 @@ public sealed partial class AboutPage : Page
     {
         InitializeComponent();
     }
+
+    private void AbrirLogs_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            string logDir = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "kHzAnalyzer", "logs");
+            System.IO.Directory.CreateDirectory(logDir); // Garante que existe antes de abrir
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = logDir,
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+        catch { }
+    }
 }

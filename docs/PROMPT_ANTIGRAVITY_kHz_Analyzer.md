@@ -304,6 +304,7 @@ Teste também:
 - caminhos com acentos, espaços, `#` e nomes longos
 - biblioteca grande (comportamento de memória e responsividade)
 - cancelamento no meio da análise (incluindo cálculo de espectrograma)
+- **[Item aberto de QA]** cancelar durante a fase de enumeração de arquivos (como uma enumeração local rápida leva ~23ms, deve ser validado testando o acesso a uma pasta grande na nuvem que exija latência, criando janela manual de clique).
 - tema claro, escuro e alternância em tempo de execução
 - **Testes estendidos das Fases 5A/5B:** espectrograma de faixas longas (10+ min), mono e estéreo, 44.1 e 48 kHz, WAV e AIFF; medição de pico de memória para leitura em blocos; concordância de Key/BPM contra uma biblioteca real.
 

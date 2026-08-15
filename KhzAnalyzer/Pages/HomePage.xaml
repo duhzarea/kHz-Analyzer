@@ -93,6 +93,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Border
@@ -169,6 +170,26 @@
                     <TextBlock
                         x:Name="ErroText"
                         Foreground="#F59E0B"
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Text="0" />
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Column="4"
+                Padding="18,14"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Spacing="2">
+                    <TextBlock
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="NÃO BAIXADOS" />
+                    <TextBlock
+                        x:Name="OfflineText"
+                        Foreground="#8B8B8B"
                         Style="{StaticResource SubtitleTextBlockStyle}"
                         Text="0" />
                 </StackPanel>

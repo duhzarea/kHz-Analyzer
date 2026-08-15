@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using KhzAnalyzer.Core;
 
 if (args.Length < 1)
@@ -17,11 +19,35 @@ if (!Directory.Exists(pasta))
 }
 
 string[] extensoes = { ".wav", ".aiff", ".aif" };
-var arquivos = Directory.EnumerateFiles(pasta, "*.*", SearchOption.AllDirectories)
-    .Where(f => extensoes.Contains(Path.GetExtension(f).ToLowerInvariant()))
-    .ToList();
 
-Console.WriteLine($"Encontrados {arquivos.Count} arquivos.\n");
+var opcoes = new EnumerationOptions
+{
+    RecurseSubdirectories = true,
+    IgnoreInaccessible = true,
+    AttributesToSkip = FileAttributes.System | FileAttributes.Temporary
+};
+
+var cronometro = Stopwatch.StartNew();
+var arquivos = new List<string>();
+int offlinePulados = 0;
+
+foreach (var arquivo in Directory.EnumerateFiles(pasta, "*.*", opcoes))
+{
+    string ext = Path.GetExtension(arquivo).ToLowerInvariant();
+    if (extensoes.Contains(ext))
+    {
+        if (File.GetAttributes(arquivo).HasFlag(FileAttributes.Offline))
+        {
+            offlinePulados++;
+            continue;
+        }
+        arquivos.Add(arquivo);
+    }
+}
+cronometro.Stop();
+
+Console.WriteLine($"Enumeração concluída em {cronometro.Elapsed}.");
+Console.WriteLine($"Encontrados {arquivos.Count} arquivos válidos ({offlinePulados} offline pulados).\n");
 
 int ok = 0, ruim = 0, erro = 0;
 
