@@ -1,0 +1,25 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Storyboard x:Key="FadeSlideInStoryboard">
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+            <DiscreteDoubleKeyFrame KeyTime="0" Value="0.0" />
+            <SplineDoubleKeyFrame KeyTime="{StaticResource DurationSlowKeyTime}" Value="1.0" KeySpline="{StaticResource SpringEasing}" />
+        </DoubleAnimationUsingKeyFrames>
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
+            <DiscreteDoubleKeyFrame KeyTime="0" Value="30" />
+            <SplineDoubleKeyFrame KeyTime="{StaticResource DurationSlowKeyTime}" Value="0" KeySpline="{StaticResource SpringEasing}" />
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+
+    <Storyboard x:Key="HoverElevateStoryboard">
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)">
+            <SplineDoubleKeyFrame KeyTime="{StaticResource DurationFastKeyTime}" Value="1.02" KeySpline="{StaticResource SpringEasing}" />
+        </DoubleAnimationUsingKeyFrames>
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)">
+            <SplineDoubleKeyFrame KeyTime="{StaticResource DurationFastKeyTime}" Value="1.02" KeySpline="{StaticResource SpringEasing}" />
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+
+</ResourceDictionary>

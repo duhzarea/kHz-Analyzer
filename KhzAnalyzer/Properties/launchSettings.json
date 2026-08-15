@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "KhzAnalyzer (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "KhzAnalyzer (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

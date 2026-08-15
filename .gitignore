@@ -1,0 +1,45 @@
+# Build
+bin/
+obj/
+
+# Python (Legado/Ferramentas)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+build/
+dist/
+*.spec
+
+# Quarentena
+_quarentena/
+
+# Relatórios e Dados Sensíveis (contêm caminhos da biblioteca pessoal)
+*.csv
+*.docx
+
+# Arquivos do Windows
+Thumbs.db
+desktop.ini
+
+# Segurança e Ambientes
+.env
+*.pfx
+*.snk
+*.key
+secrets.json
+
+# Áudio (fixtures são geradas por código; nunca versionar música)
+*.wav
+*.aiff
+*.aif
+*.flac
+*.mp3
+
+# Ferramentas de diagnóstico
+tools/FontInspector/bin/
+tools/FontInspector/obj/
+
+# Distribuicao completa de fontes (apenas os TTF em Assets/Fonts entram)
+Inter/
