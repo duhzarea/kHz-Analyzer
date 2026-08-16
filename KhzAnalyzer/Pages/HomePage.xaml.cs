@@ -131,7 +131,11 @@ public sealed partial class HomePage : Page
                     string ext = Path.GetExtension(arquivo).ToLowerInvariant();
                     if (Extensoes.Contains(ext))
                     {
-                        if (File.GetAttributes(arquivo).HasFlag(FileAttributes.Offline))
+                        bool isOffline = false;
+                        try { isOffline = File.GetAttributes(arquivo).HasFlag(FileAttributes.Offline); }
+                        catch { /* ignora erro de acesso temporário */ }
+
+                        if (isOffline)
                         {
                             arquivosOffline.Add(arquivo);
                             continue;
@@ -167,7 +171,7 @@ public sealed partial class HomePage : Page
         // Adiciona os arquivos offline diretamente na tabela
         foreach (var offline in arquivosOffline)
         {
-            var erroResult = new AnalysisResult { Arquivo = offline, Erro = "Arquivo na nuvem (não baixado)" };
+            var erroResult = new AnalysisResult { Arquivo = offline, Erro = "Arquivo na nuvem (não baixado)", IsOffline = true };
             var erroLinha = TrackRow.FromResult(erroResult);
             _todos.Add(erroLinha);
             _resultadosRaw.Add(erroResult);
@@ -181,8 +185,9 @@ public sealed partial class HomePage : Page
         var cronometroAnalise = Stopwatch.StartNew();
         int processados = arquivosOffline.Count;
 
-        // Paraleliza usando os núcleos disponíveis, deixando um livre para a interface.
-        int workers = Math.Max(1, Environment.ProcessorCount - 1);
+        // Paraleliza, mas limita agressivamente: metade dos núcleos lógicos, teto absoluto de 4.
+        // Uma configuração avançada estará disponível na Fase 5.
+        int workers = Math.Min(4, Math.Max(1, Environment.ProcessorCount / 2));
         var semaforo = new SemaphoreSlim(workers);
         var tarefas = new List<Task>();
 
@@ -193,6 +198,7 @@ public sealed partial class HomePage : Page
 
             tarefas.Add(Task.Run(() =>
             {
+                Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
                 try
                 {
                     token.ThrowIfCancellationRequested();
@@ -211,7 +217,7 @@ public sealed partial class HomePage : Page
                         int feitos = Interlocked.Increment(ref processados);
                         Progresso.Value = feitos;
                         AtualizarContadores();
-                        AtualizarStatus(feitos, total, cronometroAnalise.Elapsed, linha.Faixa);
+                        AtualizarStatus(feitos, total, cronometroAnalise.Elapsed, linha.Faixa, arquivosOffline.Count);
                     });
                 }
                 catch (Exception ex)
@@ -228,7 +234,7 @@ public sealed partial class HomePage : Page
                         int feitos = Interlocked.Increment(ref processados);
                         Progresso.Value = feitos;
                         AtualizarContadores();
-                        AtualizarStatus(feitos, total, cronometroAnalise.Elapsed, erroLinha.Faixa);
+                        AtualizarStatus(feitos, total, cronometroAnalise.Elapsed, erroLinha.Faixa, arquivosOffline.Count);
                     });
                 }
                 finally
@@ -243,16 +249,18 @@ public sealed partial class HomePage : Page
         cronometroAnalise.Stop();
         Logger.Log($"Análise concluída em {cronometroAnalise.Elapsed}. Total analisados: {total}");
         
-        string avisoOffline = arquivosOffline.Count > 0 ? $" ({arquivosOffline.Count} offline pulados)" : "";
-        StatusText.Text = $"Concluído em {FormatarTempo(cronometroAnalise.Elapsed)} — {total} faixas analisadas{avisoOffline}.";
+        int analisadosReais = total - arquivosOffline.Count;
+        string avisoOffline = arquivosOffline.Count > 0 ? $" ({arquivosOffline.Count} não baixadas)" : "";
+        StatusText.Text = $"Concluído em {FormatarTempo(cronometroAnalise.Elapsed)} — {analisadosReais} faixas analisadas{avisoOffline}.";
     }
 
-    private void AtualizarStatus(int feitos, int total, TimeSpan decorrido, string faixaAtual)
+    private void AtualizarStatus(int feitos, int total, TimeSpan decorrido, string faixaAtual, int offlineCount)
     {
         string eta = "";
-        if (feitos > 0 && feitos < total)
+        int analisados = feitos - offlineCount;
+        if (analisados > 0 && feitos < total)
         {
-            double porFaixa = decorrido.TotalSeconds / feitos;
+            double porFaixa = decorrido.TotalSeconds / analisados;
             var restante = TimeSpan.FromSeconds(porFaixa * (total - feitos));
             eta = $" · restam ~{FormatarTempo(restante)}";
         }
@@ -291,7 +299,7 @@ public sealed partial class HomePage : Page
 
         bool statusOk =
             (FiltroOk.IsChecked == true && linha.Status == StatusFaixa.Ok) ||
-            (FiltroProblemas.IsChecked == true && linha.Status != StatusFaixa.Ok) ||
+            (FiltroProblemas.IsChecked == true && (linha.Status == StatusFaixa.Abaixo || linha.Status == StatusFaixa.Erro)) ||
             (FiltroOk.IsChecked != true && FiltroProblemas.IsChecked != true);
 
         string busca = BuscaBox?.Text?.Trim() ?? "";
@@ -311,10 +319,19 @@ public sealed partial class HomePage : Page
     private async void ExportarButton_Click(object sender, RoutedEventArgs e)
     {
         string pasta = PastaTextBox.Text?.Trim().Trim('"') ?? "";
-        if (string.IsNullOrWhiteSpace(pasta) || !Directory.Exists(pasta) || _resultadosRaw.Count == 0)
+        if (string.IsNullOrWhiteSpace(pasta) || _resultadosRaw.Count == 0)
         {
-            StatusText.Text = "Não há resultados para exportar nesta pasta.";
+            StatusText.Text = "Não há resultados para exportar.";
             return;
+        }
+
+        var picker = new Microsoft.Windows.Storage.Pickers.FolderPicker(
+            XamlRoot.ContentIslandEnvironment.AppWindowId);
+        
+        var pastaDestino = await picker.PickSingleFolderAsync();
+        if (pastaDestino is null || string.IsNullOrWhiteSpace(pastaDestino.Path))
+        {
+            return; // Cancelou
         }
 
         ExportarButton.IsEnabled = false;
@@ -325,8 +342,8 @@ public sealed partial class HomePage : Page
             // Cria cópia segura para processamento assíncrono
             var resultados = _resultadosRaw.ToList();
             
-            string csvPath = Path.Combine(pasta, "relatorio_20khz.csv");
-            string docxPath = Path.Combine(pasta, "Relatorio_20kHz.docx");
+            string csvPath = Path.Combine(pastaDestino.Path, "relatorio_20khz.csv");
+            string docxPath = Path.Combine(pastaDestino.Path, "Relatorio_20kHz.docx");
 
             await Task.Run(() =>
             {

@@ -52,6 +52,7 @@ Microsoft Store, com identidade visual própria e de alto padrão.
 8. Mantenha `README.md` na raiz do projeto atualizado ao final de cada fase.
 9. A interface deve permanecer responsiva durante análises longas (a análise roda
    fora da thread de UI).
+10. **REGRA PERMANENTE:** Rode `dotnet build` e confirme 0 erros ANTES de reportar qualquer trabalho como concluído. Não entregue código quebrado sob pretexto de que a lógica está certa.
 
 ---
 

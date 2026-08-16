@@ -55,7 +55,7 @@ public static class DocxReport
         int total = results.Count();
         int ok = results.Count(r => r.EhOk);
         int abaixo = results.Count(r => r.EhAbaixo);
-        int offline = results.Count(r => r.Erro == "Arquivo na nuvem (não baixado)");
+        int offline = results.Count(r => r.IsOffline);
         int erros = total - ok - abaixo - offline;
 
         sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} faixas analisadas  ·  {ok} OK  ·  {abaixo} abaixo de 20kHz  ·  {offline} offline  ·  {erros} erros</w:t></w:r></w:p>");
@@ -110,11 +110,11 @@ public static class DocxReport
             string vColor = "000000";
             bool vBold = false;
             
-            if (r.Erro == "Arquivo na nuvem (não baixado)")
+            if (r.IsOffline)
             {
                 vColor = "8B8B8B"; // Gray
                 vBold = false;
-                vereditoTxt = r.Erro;
+                vereditoTxt = r.Erro ?? "Offline";
             }
             else if (r.Erro != null)
             {

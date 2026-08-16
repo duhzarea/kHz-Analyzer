@@ -17,6 +17,9 @@ public sealed class AnalysisResult
     public double FreqMaximaDetectada { get; init; }
     public string Veredito { get; init; } = "";
     public string? Erro { get; init; }
+    
+    // Indica se a faixa não pôde ser analisada porque estava apenas na nuvem
+    public bool IsOffline { get; init; }
 
     public bool EhOk => Erro is null && Veredito.StartsWith("OK");
     public bool EhAbaixo => Erro is null && Veredito.StartsWith("ABAIXO");

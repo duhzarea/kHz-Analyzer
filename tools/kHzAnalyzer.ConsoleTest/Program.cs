@@ -49,28 +49,41 @@ cronometro.Stop();
 Console.WriteLine($"Enumeração concluída em {cronometro.Elapsed}.");
 Console.WriteLine($"Encontrados {arquivos.Count} arquivos válidos ({offlinePulados} offline pulados).\n");
 
+var cronometroAnalise = Stopwatch.StartNew();
 int ok = 0, ruim = 0, erro = 0;
+
+int workers = Math.Min(4, Math.Max(1, Environment.ProcessorCount / 2));
+Console.WriteLine($"Executando com {workers} workers...");
+
+var semaforo = new SemaphoreSlim(workers);
+var tarefas = new List<Task>();
+var r_lock = new object();
 
 foreach (var caminho in arquivos)
 {
-    var r = SpectrumAnalyzer.Analisar(caminho);
-    var (key, bpm, faixa) = TrackNameParser.Parse(caminho);
-
-    if (r.Erro is not null)
+    semaforo.Wait();
+    tarefas.Add(Task.Run(() =>
     {
-        erro++;
-        Console.WriteLine($"[ERRO] {faixa} — {r.Erro}");
-    }
-    else if (r.EhOk)
-    {
-        ok++;
-        Console.WriteLine($"[OK]   {faixa} ({key} {bpm}bpm) — {r.SampleRate}Hz/{r.Bits}bit — até {r.FreqMaximaDetectada}Hz");
-    }
-    else
-    {
-        ruim++;
-        Console.WriteLine($"[BAIXO] {faixa} — {r.Veredito}");
-    }
+        Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+        try
+        {
+            var r = SpectrumAnalyzer.Analisar(caminho);
+            lock (r_lock)
+            {
+                if (r.Erro is not null) erro++;
+                else if (r.EhOk) ok++;
+                else ruim++;
+            }
+        }
+        catch { lock (r_lock) erro++; }
+        finally { semaforo.Release(); }
+    }));
 }
 
-Console.WriteLine($"\nTotal: {arquivos.Count}  ·  OK: {ok}  ·  Abaixo: {ruim}  ·  Erros: {erro}");
+Task.WaitAll(tarefas.ToArray());
+cronometroAnalise.Stop();
+
+long peakMb = Process.GetCurrentProcess().PeakWorkingSet64 / (1024 * 1024);
+Console.WriteLine($"\nAnálise concluída em {cronometroAnalise.Elapsed}.");
+Console.WriteLine($"Total: {arquivos.Count}  ·  OK: {ok}  ·  Abaixo: {ruim}  ·  Erros: {erro}");
+Console.WriteLine($"Pico de Memória (Peak Working Set): {peakMb} MB");
