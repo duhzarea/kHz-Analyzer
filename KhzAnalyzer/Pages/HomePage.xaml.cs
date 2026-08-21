@@ -190,6 +190,10 @@ public sealed partial class HomePage : Page
         int workers = Math.Min(4, Math.Max(1, Environment.ProcessorCount / 2));
         var semaforo = new SemaphoreSlim(workers);
         var tarefas = new List<Task>();
+        
+        string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "kHzAnalyzer");
+        Directory.CreateDirectory(appData);
+        using var cache = new AnalysisCache(Path.Combine(appData, "cache.db"));
 
         foreach (string caminho in arquivos)
         {
@@ -203,7 +207,13 @@ public sealed partial class HomePage : Page
                 {
                     token.ThrowIfCancellationRequested();
                     Logger.Log($"[INICIO] {caminho}");
-                    AnalysisResult resultado = SpectrumAnalyzer.Analisar(caminho);
+                    
+                    AnalysisResult resultado = cache.TryGet(caminho);
+                    if (resultado == null)
+                    {
+                        resultado = SpectrumAnalyzer.Analisar(caminho);
+                        cache.Save(resultado);
+                    }
 
                     DispatcherQueue.TryEnqueue(() =>
                     {

@@ -99,7 +99,42 @@ public static class Fft
         return (freqs, psd);
     }
 
-    private static double[] HannWindow(int n)
+    public static double[] Periodogram(float[] signal, int sampleRate, double[] window)
+    {
+        int segLen = signal.Length;
+        double windowPowerSum = 0;
+        for (int i=0; i<window.Length; i++) windowPowerSum += window[i] * window[i];
+        if (windowPowerSum <= 0) windowPowerSum = 1;
+
+        int bins = segLen / 2 + 1;
+        var buffer = new Complex[segLen];
+        for (int i = 0; i < segLen; i++)
+            buffer[i] = new Complex(signal[i] * window[i], 0);
+
+        Transform(buffer);
+
+        var psd = new double[bins];
+        for (int k = 0; k < bins; k++)
+        {
+            double mag = buffer[k].Magnitude;
+            double power = (mag * mag) / (sampleRate * windowPowerSum);
+            if (k > 0 && k < bins - 1) power *= 2; 
+            psd[k] = power;
+        }
+
+        return psd;
+    }
+
+    public static double[] Rfftfreq(int windowSize, double d)
+    {
+        int bins = windowSize / 2 + 1;
+        var freqs = new double[bins];
+        double sampleRate = 1.0 / d;
+        for (int i = 0; i < bins; i++) freqs[i] = i * sampleRate / windowSize;
+        return freqs;
+    }
+
+    public static double[] HannWindow(int n)
     {
         var w = new double[n];
         if (n == 1) { w[0] = 1; return w; }

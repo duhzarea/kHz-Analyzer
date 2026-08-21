@@ -1,0 +1,21 @@
+G:\#kHz Analyzer\tests\fixtures\aiff_20500hz_16b44k.aiff
+G:\#kHz Analyzer\tests\fixtures\aiff_48k_24bit.aiff
+G:\#kHz Analyzer\tests\fixtures\invalid_header.wav
+G:\#kHz Analyzer\tests\fixtures\lowpass_8khz_16b44k.wav
+G:\#kHz Analyzer\tests\fixtures\nyquist_16khz_16b32k.wav
+G:\#kHz Analyzer\tests\fixtures\sine_21khz_24b44k.wav
+G:\#kHz Analyzer\tests\fixtures\stereo_21khz.wav
+G:\#kHz Analyzer\tests\fixtures\tiny_512samples.wav
+G:\NOT SHARE\Gnarls Barkley - Crazy (GABSS AFTERNOON EDIT).wav
+G:\NOT SHARE\5A - 130 - Fatsync, DOUG! - Fire!.wav
+G:\NOT SHARE\11A - 128 - GREG Matrix Noise.aiff
+G:\NOT SHARE\12A - 130 - Vintage Culture & Volkoder - Pornstar.aiff
+G:\NOT SHARE\1A - 128 - GREG Eyes On Me.aiff
+G:\NOT SHARE\2A - 127 - Adam K & Gabe - ID.wav
+G:\NOT SHARE\4A - 130 - Gabe & Fezzo - Gin e Juice [UNR].wav
+G:\NOT SHARE\8A - 130 - TOUGH ART - ROLLERCOASTER MASTER1.wav
+G:\NOT SHARE\Anyma x Volkoder - Another Dimension.wav
+G:\NOT SHARE\Blue Monday (Tough Art Edit).wav
+G:\NOT SHARE\Gabss, Balanka - Bottles (Original Mix).aiff
+G:\NOT SHARE\Laid Back - White Horse (Tough Art Edit) Master.wav
+G:\NOT SHARE\Vylow, Dekho - Handle That [Master V1].aiff

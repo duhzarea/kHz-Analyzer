@@ -4,6 +4,22 @@ using System.Text;
 
 namespace KhzAnalyzer.Core;
 
+public class AudioMetadata
+{
+    public string Path { get; set; } = "";
+    public string Format { get; set; } = ""; // "WAV" ou "AIFF"
+    public int SampleRate { get; set; }
+    public int Bits { get; set; }
+    public int Channels { get; set; }
+    public long DataChunkOffset { get; set; }
+    public long DataChunkLength { get; set; }
+    public bool IsFloat { get; set; }
+    
+    public int BytesPerSample => Math.Max(Bits / 8, 1);
+    public int FrameSize => BytesPerSample * Math.Max(Channels, 1);
+    public long TotalFrames => FrameSize > 0 ? DataChunkLength / FrameSize : 0;
+}
+
 /// <summary>
 /// Lê arquivos .wav (RIFF/WAVE) e .aiff/.aif (FORM/AIFF, incluindo AIFC comprimido em PCM)
 /// sem depender de bibliotecas externas. Mixa todos os canais para mono, igual à versão Python.
@@ -12,22 +28,52 @@ public static class WavAiffReader
 {
     public static AudioData Read(string path)
     {
+        var meta = GetMetadata(path);
+        float[] samples = ReadBlock(meta, 0, (int)meta.TotalFrames);
+        return new AudioData { Samples = samples, SampleRate = meta.SampleRate, Bits = meta.Bits };
+    }
+
+    public static AudioMetadata GetMetadata(string path)
+    {
         using var stream = File.OpenRead(path);
         using var reader = new BinaryReader(stream);
 
         string tag = Encoding.ASCII.GetString(reader.ReadBytes(4));
-
         return tag switch
         {
-            "RIFF" => ReadWav(reader),
-            "FORM" => ReadAiff(reader),
+            "RIFF" => GetMetadataWav(path, reader),
+            "FORM" => GetMetadataAiff(path, reader),
             _ => throw new InvalidDataException("formato não reconhecido (esperado RIFF/WAV ou FORM/AIFF)"),
         };
     }
 
+    public static float[] ReadBlock(AudioMetadata meta, long startSample, int length)
+    {
+        if (startSample >= meta.TotalFrames || length <= 0)
+            return Array.Empty<float>();
+
+        long startByteOffset = startSample * meta.FrameSize;
+        long maxBytes = meta.DataChunkLength - startByteOffset;
+        if (maxBytes <= 0) return Array.Empty<float>();
+
+        long bytesToRead = (long)length * meta.FrameSize;
+        bytesToRead = Math.Min(bytesToRead, maxBytes);
+
+        using var stream = File.OpenRead(meta.Path);
+        stream.Seek(meta.DataChunkOffset + startByteOffset, SeekOrigin.Begin);
+        
+        using var reader = new BinaryReader(stream);
+        byte[] dataBytes = reader.ReadBytes((int)bytesToRead);
+
+        if (meta.Format == "WAV")
+            return DecodePcmLittleEndian(dataBytes, meta.Bits, meta.Channels, meta.IsFloat);
+        else
+            return DecodePcmBigEndian(dataBytes, meta.Bits, meta.Channels);
+    }
+
     // ---------------------------------------------------------------- WAV --
 
-    private static AudioData ReadWav(BinaryReader reader)
+    private static AudioMetadata GetMetadataWav(string path, BinaryReader reader)
     {
         reader.ReadUInt32(); // tamanho do RIFF, não usado
         string wave = Encoding.ASCII.GetString(reader.ReadBytes(4));
@@ -35,7 +81,10 @@ public static class WavAiffReader
             throw new InvalidDataException("RIFF sem sub-chunk WAVE");
 
         int channels = 1, sampleRate = 0, bits = 16, audioFormat = 1;
-        byte[]? dataBytes = null;
+        long dataChunkOffset = -1;
+        long dataChunkLength = 0;
+        bool hasFmt = false;
+        bool hasData = false;
 
         long len = reader.BaseStream.Length;
         while (reader.BaseStream.Position + 8 <= len)
@@ -53,25 +102,38 @@ public static class WavAiffReader
                 reader.ReadInt32();   // byte rate
                 reader.ReadInt16();   // block align
                 bits = reader.ReadInt16();
+                hasFmt = true;
             }
             else if (chunkId == "data")
             {
-                dataBytes = reader.ReadBytes((int)safeSize);
+                dataChunkOffset = chunkStart;
+                dataChunkLength = safeSize;
+                hasData = true;
             }
+
+            if (hasFmt && hasData) break; // temos tudo que importa
 
             long next = chunkStart + chunkSize + (chunkSize % 2); // chunks alinhados em 2 bytes
             if (next <= chunkStart) break; // guarda contra chunk corrompido/loop infinito
             reader.BaseStream.Position = Math.Min(next, len);
         }
 
-        if (dataBytes is null)
+        if (!hasData)
             throw new InvalidDataException("chunk 'data' não encontrado");
         if (sampleRate <= 0)
             throw new InvalidDataException("chunk 'fmt ' não encontrado ou inválido");
 
-        bool isFloat = audioFormat == 3; // WAVE_FORMAT_IEEE_FLOAT
-        float[] samples = DecodePcmLittleEndian(dataBytes, bits, channels, isFloat);
-        return new AudioData { Samples = samples, SampleRate = sampleRate, Bits = bits };
+        return new AudioMetadata
+        {
+            Path = path,
+            Format = "WAV",
+            SampleRate = sampleRate,
+            Bits = bits,
+            Channels = channels,
+            DataChunkOffset = dataChunkOffset,
+            DataChunkLength = dataChunkLength,
+            IsFloat = audioFormat == 3
+        };
     }
 
     private static float[] DecodePcmLittleEndian(byte[] data, int bits, int channels, bool isFloat)
@@ -117,7 +179,7 @@ public static class WavAiffReader
 
     // --------------------------------------------------------------- AIFF --
 
-    private static AudioData ReadAiff(BinaryReader reader)
+    private static AudioMetadata GetMetadataAiff(string path, BinaryReader reader)
     {
         reader.ReadUInt32BigEndianCompat(); // tamanho do FORM, não usado
         string formType = Encoding.ASCII.GetString(reader.ReadBytes(4)); // "AIFF" ou "AIFC"
@@ -126,7 +188,10 @@ public static class WavAiffReader
 
         int channels = 1, bits = 16;
         double sampleRate = 0;
-        byte[]? soundData = null;
+        long dataChunkOffset = -1;
+        long dataChunkLength = 0;
+        bool hasComm = false;
+        bool hasSsnd = false;
 
         long len = reader.BaseStream.Length;
         while (reader.BaseStream.Position + 8 <= len)
@@ -142,6 +207,7 @@ public static class WavAiffReader
                 reader.ReadBytes(4); // numSampleFrames, recalculado a partir do SSND
                 bits = ReadInt16BE(reader);
                 sampleRate = ReadExtended80(reader);
+                hasComm = true;
             }
             else if (chunkId == "SSND")
             {
@@ -150,23 +216,35 @@ public static class WavAiffReader
                 long dataLen = safeSize - 8 - offset;
                 if (dataLen > 0)
                 {
-                    reader.BaseStream.Position += offset;
-                    soundData = reader.ReadBytes((int)dataLen);
+                    dataChunkOffset = reader.BaseStream.Position + offset;
+                    dataChunkLength = dataLen;
+                    hasSsnd = true;
                 }
             }
+
+            if (hasComm && hasSsnd) break;
 
             long next = chunkStart + chunkSize + (chunkSize % 2);
             if (next <= chunkStart) break;
             reader.BaseStream.Position = Math.Min(next, len);
         }
 
-        if (soundData is null)
+        if (!hasSsnd)
             throw new InvalidDataException("chunk 'SSND' não encontrado");
         if (sampleRate <= 0)
             throw new InvalidDataException("chunk 'COMM' não encontrado ou inválido");
 
-        float[] samples = DecodePcmBigEndian(soundData, bits, channels);
-        return new AudioData { Samples = samples, SampleRate = (int)Math.Round(sampleRate), Bits = bits };
+        return new AudioMetadata
+        {
+            Path = path,
+            Format = "AIFF",
+            SampleRate = (int)Math.Round(sampleRate),
+            Bits = bits,
+            Channels = channels,
+            DataChunkOffset = dataChunkOffset,
+            DataChunkLength = dataChunkLength,
+            IsFloat = false
+        };
     }
 
     private static float[] DecodePcmBigEndian(byte[] data, int bits, int channels)
@@ -223,10 +301,6 @@ public static class WavAiffReader
         return (short)((b[0] << 8) | b[1]);
     }
 
-    /// <summary>
-    /// O sample rate no AIFF é armazenado como IEEE 754 extended precision (80 bits, big-endian).
-    /// .NET não tem esse tipo nativo, então decodificamos manualmente.
-    /// </summary>
     private static double ReadExtended80(BinaryReader r)
     {
         byte[] b = r.ReadBytes(10);
@@ -246,7 +320,6 @@ public static class WavAiffReader
 
 internal static class BinaryReaderCompatExtensions
 {
-    // pequeno helper só pra deixar explícito, no FORM, que o tamanho é big-endian e é ignorado
     public static uint ReadUInt32BigEndianCompat(this BinaryReader r)
     {
         byte[] b = r.ReadBytes(4);
