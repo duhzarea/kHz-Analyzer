@@ -19,7 +19,7 @@ detectam tonalidade e andamento ao carregar uma faixa.
 
 ## PRINCÍPIO ARQUITETURAL OBRIGATÓRIO
 
-O motor de verificação de 20 kHz (`SpectrumAnalyzer`) está validado e é o núcleo
+O motor de verificação de 19 kHz (`SpectrumAnalyzer`) está validado e é o núcleo
 do produto. As novas análises são **módulos independentes e adicionais**:
 
 ```

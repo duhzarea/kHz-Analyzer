@@ -10,6 +10,7 @@ public class AnalysisCache : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly object _lock = new object();
+    private const string EngineVersion = "v3_19khz_astreaming";
 
     public AnalysisCache(string dbPath)
     {
@@ -36,6 +37,29 @@ public class AnalysisCache : IDisposable
                 Error TEXT
             )";
         command.ExecuteNonQuery();
+
+        // Add EngineVersion column if it doesn't exist
+        try
+        {
+            using var cmdAlter = _connection.CreateCommand();
+            cmdAlter.CommandText = "ALTER TABLE Cache ADD COLUMN EngineVersion TEXT";
+            cmdAlter.ExecuteNonQuery();
+        }
+        catch (SqliteException)
+        {
+            // Column might already exist
+        }
+
+        // Remove old entries
+        using var cmdClean = _connection.CreateCommand();
+        cmdClean.CommandText = "DELETE FROM Cache WHERE EngineVersion IS NULL OR EngineVersion != @ver";
+        cmdClean.Parameters.AddWithValue("@ver", EngineVersion);
+        cmdClean.ExecuteNonQuery();
+
+        // Vacuum to reclaim space
+        using var cmdVacuum = _connection.CreateCommand();
+        cmdVacuum.CommandText = "VACUUM";
+        cmdVacuum.ExecuteNonQuery();
     }
 
     public void Dispose()
@@ -45,8 +69,8 @@ public class AnalysisCache : IDisposable
 
     private string GetFileHash(string path, FileInfo fi)
     {
-        // Using FilePath + Size + LastWriteTime as a fast pseudo-hash for cache invalidation
-        string input = $"{path}|{fi.Length}|{fi.LastWriteTimeUtc.Ticks}";
+        // Using FilePath + Size + LastWriteTime + EngineVersion as a fast pseudo-hash for cache invalidation
+        string input = $"{path}|{fi.Length}|{fi.LastWriteTimeUtc.Ticks}|{EngineVersion}";
         using var sha256 = SHA256.Create();
         var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
         return Convert.ToBase64String(bytes);
@@ -102,24 +126,19 @@ public class AnalysisCache : IDisposable
             {
                 using var command = _connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO Cache (FileHash, FilePath, FileSize, LastModified, SampleRate, Bits, FreqMax, Verdict, Error)
-                    VALUES ($hash, $path, $size, $mod, $sr, $bits, $freq, $verdict, $err)
-                    ON CONFLICT(FileHash) DO UPDATE SET
-                        SampleRate = excluded.SampleRate,
-                        Bits = excluded.Bits,
-                        FreqMax = excluded.FreqMax,
-                        Verdict = excluded.Verdict,
-                        Error = excluded.Error";
+                INSERT OR REPLACE INTO Cache (FileHash, FilePath, FileSize, LastModified, SampleRate, Bits, FreqMax, Verdict, Error, EngineVersion)
+                VALUES (@hash, @path, @size, @mod, @sr, @bits, @freq, @verdict, @error, @ver)";
 
-                command.Parameters.AddWithValue("$hash", hash);
-                command.Parameters.AddWithValue("$path", result.Arquivo);
-                command.Parameters.AddWithValue("$size", fi.Length);
-                command.Parameters.AddWithValue("$mod", fi.LastWriteTimeUtc.Ticks);
-                command.Parameters.AddWithValue("$sr", result.SampleRate);
-                command.Parameters.AddWithValue("$bits", result.Bits);
-                command.Parameters.AddWithValue("$freq", result.FreqMaximaDetectada);
-                command.Parameters.AddWithValue("$verdict", result.Veredito);
-                command.Parameters.AddWithValue("$err", result.Erro ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@hash", hash);
+                command.Parameters.AddWithValue("@path", result.Arquivo);
+                command.Parameters.AddWithValue("@size", fi.Length);
+                command.Parameters.AddWithValue("@mod", fi.LastWriteTimeUtc.Ticks);
+                command.Parameters.AddWithValue("@sr", result.SampleRate);
+                command.Parameters.AddWithValue("@bits", result.Bits);
+                command.Parameters.AddWithValue("@freq", result.FreqMaximaDetectada);
+                command.Parameters.AddWithValue("@verdict", result.Veredito ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@error", result.Erro ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@ver", EngineVersion);
 
                 command.ExecuteNonQuery();
             }

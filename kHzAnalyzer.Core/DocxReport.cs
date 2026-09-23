@@ -49,7 +49,7 @@ public static class DocxReport
   <w:body>");
 
         // Title
-        sb.Append(@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val=""36""/></w:rPr><w:t>Relatório de Análise Espectral — 20kHz</w:t></w:r></w:p>");
+        sb.Append(@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val=""36""/></w:rPr><w:t>Relatório de Análise Espectral — 19kHz</w:t></w:r></w:p>");
 
         // Summary
         int total = results.Count();
@@ -58,7 +58,7 @@ public static class DocxReport
         int offline = results.Count(r => r.IsOffline);
         int erros = total - ok - abaixo - offline;
 
-        sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} faixas analisadas  ·  {ok} OK  ·  {abaixo} abaixo de 20kHz  ·  {offline} offline  ·  {erros} erros</w:t></w:r></w:p>");
+        sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} faixas analisadas  ·  {ok} OK  ·  {abaixo} abaixo de 19kHz  ·  {offline} offline  ·  {erros} erros</w:t></w:r></w:p>");
         sb.Append(@"<w:p/>"); // empty line
 
         // Table
@@ -105,7 +105,7 @@ public static class DocxReport
             string bits = r.Erro != null ? "-" : r.Bits.ToString();
             string freq = r.Erro != null ? "-" : r.FreqMaximaDetectada.ToString("N0", culture) + " Hz";
             
-            string vereditoTxt = r.Erro != null ? "ERRO: " + r.Erro : (r.EhOk ? "OK — chega em 20kHz+" : r.Veredito);
+            string vereditoTxt = r.Erro != null ? "ERRO: " + r.Erro : (r.EhOk ? "OK — chega em 19kHz+" : r.Veredito);
             
             string vColor = "000000";
             bool vBold = false;

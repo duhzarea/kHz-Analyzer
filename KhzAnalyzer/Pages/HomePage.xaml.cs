@@ -208,7 +208,7 @@ public sealed partial class HomePage : Page
                     token.ThrowIfCancellationRequested();
                     Logger.Log($"[INICIO] {caminho}");
                     
-                    AnalysisResult resultado = cache.TryGet(caminho);
+                    AnalysisResult? resultado = cache.TryGet(caminho);
                     if (resultado == null)
                     {
                         resultado = SpectrumAnalyzer.Analisar(caminho);
@@ -352,8 +352,8 @@ public sealed partial class HomePage : Page
             // Cria cópia segura para processamento assíncrono
             var resultados = _resultadosRaw.ToList();
             
-            string csvPath = Path.Combine(pastaDestino.Path, "relatorio_20khz.csv");
-            string docxPath = Path.Combine(pastaDestino.Path, "Relatorio_20kHz.docx");
+            string csvPath = Path.Combine(pastaDestino.Path, "relatorio_19khz.csv");
+            string docxPath = Path.Combine(pastaDestino.Path, "Relatorio_19kHz.docx");
 
             await Task.Run(() =>
             {

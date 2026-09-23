@@ -33,6 +33,12 @@ class Program
         // 8. tiny_512samples.wav
         WriteWav(Path.Combine(outDir, "tiny_512samples.wav"), 44100, 16, 1, GenerateSine(1000, 44100, 16, 512 / 44100.0)); // < 1024 samples
 
+        // 9. sustained_19400hz.wav
+        WriteWav(Path.Combine(outDir, "sustained_19400hz.wav"), 44100, 16, 1, GenerateSine(19400, 44100, 16, 2));
+
+        // 10. sustained_18500hz.wav
+        WriteWav(Path.Combine(outDir, "sustained_18500hz.wav"), 44100, 16, 1, GenerateSine(18500, 44100, 16, 2));
+
         Console.WriteLine("Fixtures generated successfully.");
         
         string expectedMd = @"# Expected Results
@@ -44,7 +50,9 @@ class Program
 - `aiff_20500hz_16b44k.aiff`: OK (44100Hz, 16-bit, Max Freq ~20500Hz)
 - `aiff_48k_24bit.aiff`: OK (48000Hz, 24-bit, Max Freq ~23000Hz)
 - `stereo_21khz.wav`: OK (44100Hz, 16-bit, Channels 2, Max Freq ~21000Hz after mono mix)
-- `tiny_512samples.wav`: ERRO (Not enough samples)";
+- `tiny_512samples.wav`: ERRO (Not enough samples)
+- `sustained_19400hz.wav`: OK (44100Hz, 16-bit, Max Freq ~19400Hz)
+- `sustained_18500hz.wav`: ABAIXO (44100Hz, 16-bit, Max Freq ~18500Hz)";
         File.WriteAllText(Path.Combine(outDir, "expected.md"), expectedMd);
     }
 

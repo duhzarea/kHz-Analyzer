@@ -8,7 +8,7 @@ namespace KhzAnalyzer.Core;
 
 public static class SpectrumAnalyzer
 {
-    public const double FreqAlvo = 20000;
+    public const double FreqAlvo = 19000;
     public const double MargemDb = 3.0;
 
     public static double PisoDeRuidoTeorico(int bits)
@@ -59,25 +59,23 @@ public static class SpectrumAnalyzer
         return AnalisarAmostrado(caminho, 8192, true, 40, true);
     }
 
-    // Motor de Triagem (Estágio 1: F-80, Estágio 2: A-Streaming)
+    // Motor de Triagem original (Desativado no caminho de produção)
+    // Mantido apenas para experimentação e histórico (vide docs/limite-tamanho-janela.md)
     public static AnalysisResult AnalisarTriagem(string caminho)
     {
         var res1 = AnalisarF(caminho);
-        if (res1.Erro != null) return res1; // Falhou no estágio 1 (ex: header inválido, arquivo curto)
+        if (res1.Erro != null) return res1;
 
-        // Se o FreqMax local for < 18.000 Hz, reprovamos direto.
-        // Se o FreqMax local for > 21.500 Hz, aprovamos direto.
-        if (res1.FreqMaximaDetectada < 18000 || res1.FreqMaximaDetectada > 21500)
+        if (res1.FreqMaximaDetectada < 18000.0)
         {
             return res1;
         }
 
-        // Estágio 2 (Seguro): Se o valor cair na zona limítrofe, executamos A-Streaming
         return AnalisarA(caminho);
     }
 
-    // Retorna a melhor variante como default
-    public static AnalysisResult Analisar(string caminho, bool usarTriagem = true)
+    // Retorna a melhor variante como default (A-Streaming)
+    public static AnalysisResult Analisar(string caminho, bool usarTriagem = false)
     {
         if (usarTriagem) return AnalisarTriagem(caminho);
         return AnalisarA(caminho);
@@ -121,6 +119,8 @@ public static class SpectrumAnalyzer
 
         int bins = segLen / 2 + 1;
         var psdAccum = new double[bins];
+        var psdOut = new double[bins];
+        var buffer = new System.Numerics.Complex[segLen];
         int used = 0;
 
         double[] window = Fft.HannWindow(segLen);
@@ -134,10 +134,10 @@ public static class SpectrumAnalyzer
             float[] block = WavAiffReader.ReadBlock(meta, start, segLen);
             if (block.Length < segLen) continue;
 
-            var psd = Fft.Periodogram(block, meta.SampleRate, window);
+            Fft.Periodogram(block, meta.SampleRate, window, buffer, psdOut);
             for (int k = 0; k < bins; k++)
             {
-                psdAccum[k] += psd[k];
+                psdAccum[k] += psdOut[k];
             }
             used++;
         }
@@ -238,6 +238,8 @@ public static class SpectrumAnalyzer
 
         int freqsCount = windowSize / 2 + 1;
         var psdConsolidado = new double[freqsCount];
+        var psdOut = new double[freqsCount];
+        var buffer = new System.Numerics.Complex[windowSize];
         
         if (!useMax)
         {
@@ -275,14 +277,14 @@ public static class SpectrumAnalyzer
                 continue; 
 
             // Aplica janela e FFT
-            double[] psd = Fft.Periodogram(block, meta.SampleRate, window);
+            Fft.Periodogram(block, meta.SampleRate, window, buffer, psdOut);
 
             for (int k = 0; k < freqsCount; k++)
             {
                 if (useMax)
-                    psdConsolidado[k] = Math.Max(psdConsolidado[k], psd[k]);
+                    psdConsolidado[k] = Math.Max(psdConsolidado[k], psdOut[k]);
                 else
-                    psdConsolidado[k] += psd[k]; // soma para média depois
+                    psdConsolidado[k] += psdOut[k]; // soma para média depois
             }
             validWindows++;
         }

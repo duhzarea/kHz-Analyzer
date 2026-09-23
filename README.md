@@ -1,13 +1,13 @@
 # kHz Analyzer
 
-O **kHz Analyzer** é uma ferramenta de análise técnica de áudio desenhada para música eletrônica. Ela varre em lote arquivos de áudio (`.wav`, `.aiff`, `.aif`) de uma pasta (de forma recursiva) e verifica, por meio de análise espectral nativa (FFT), se cada faixa possui energia real detectável até a banda de 20 kHz.
+O **kHz Analyzer** é uma ferramenta de análise técnica de áudio desenhada para música eletrônica. Ela varre em lote arquivos de áudio (`.wav`, `.aiff`, `.aif`) de uma pasta (de forma recursiva) e verifica, por meio de análise espectral nativa (FFT), se cada faixa possui energia real detectável até a banda de 19 kHz.
 
 ## Critério Técnico de Análise
 
 O aplicativo não se fia apenas nos metadados de taxa de amostragem (ex: 44.1 kHz), pois um arquivo pode ter sofrido um *hard cut* aos 16 kHz no processo de masterização. O critério de avaliação utiliza:
-*   **Banda de Análise:** Verifica a energia espectral entre 18 kHz e 20+ kHz.
+*   **Banda de Análise:** Verifica a energia espectral entre 18 kHz e 19+ kHz.
 *   **Piso de Ruído:** O limiar de corte é calculado a partir do piso de ruído de quantização do próprio arquivo (derivado da profundidade de bits: 16, 24 ou 32 bits).
-*   **Margem:** Utiliza-se uma margem de segurança de 3 dB acima do piso de ruído.
+*   **Avaliação Rigorosa:** Só aprova faixas que de fato contêm informação harmônica ou ruído sustentado no limite superior audível (19 kHz). Picos isolados, harmônicos falsos por *aliasing*, ou *upsampling* mal feito são ignorados pela avaliação em 65536 pontos com média de potência (Welch/PSD).
 *   **Processamento:** Os canais (quando estéreo ou superior) são mixados para mono e a Densidade Espectral de Potência (PSD) é calculada usando uma implementação otimizada sem dependências externas.
 
 ## Estrutura de Pastas
@@ -23,6 +23,10 @@ O aplicativo não se fia apenas nos metadados de taxa de amostragem (ex: 44.1 kH
 *   O motor de análise matemática (`kHzAnalyzer.Core`) está **validado, robusto e finalizado**, dispensando dependências de terceiros (como NAudio ou MathNet).
 *   A interface (`KhzAnalyzer`) está estabelecida em **WinUI 3**, integrando-se perfeitamente com o motor de análise via C#. 
 *   **Geração de Relatórios:** Implementação nativa (`.docx` e `.csv`) totalmente concluída dentro de `kHzAnalyzer.Core` (sem dependências como OpenXml), rodando de forma paralela via Task.
+
+### Dependências
+A fim de fornecer um sistema de cache robusto para aceleração de re-análises, o projeto utiliza `Microsoft.Data.Sqlite`. Isso traz uma biblioteca nativa subjacente (`e_sqlite3.dll`) que é empacotada no aplicativo final via MSIX.
+
 *   **Em desenvolvimento:** Redesign visual premium (Design System) da interface WinUI 3 (Fases 2 e 3).
 
 ## Como Rodar em Desenvolvimento

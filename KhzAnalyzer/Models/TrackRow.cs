@@ -77,7 +77,7 @@ public sealed class TrackRow
             SampleRate = $"{r.SampleRate:N0} Hz",
             Bits = $"{r.Bits} bit",
             FreqMax = $"{r.FreqMaximaDetectada:N0} Hz",
-            Veredito = ok ? "Chega em 20 kHz+" : r.Veredito,
+            Veredito = ok ? "Chega em 19 kHz+" : r.Veredito,
             StatusGlyph = ok ? "\uE73E" : "\uE7BA",
             StatusBrush = ok
                 ? new SolidColorBrush(ColorHelper.FromArgb(255, 0x2E, 0xA0, 0x43))

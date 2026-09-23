@@ -100,3 +100,10 @@ Para assegurar curvatura de pílula absoluta sem o uso perigoso de valores irrac
 
 ## 6. Drag-and-Drop (UX Funcional)
 Implementaremos de fato a operação de arrastar e soltar no Grid central do app. Esta operação requererá manipular os eventos `DragOver` e `Drop` na UI Thread (~15 linhas de código C#), extraindo o caminho da pasta via `DataPackageView` e chamando a análise, entregando um fluxo nativo premium para ferramentas desktop.
+
+---
+
+## 7. Critério Técnico de 19 kHz (Setembro/2026)
+**Decisão de Produto (Produtor/DJ):** O limite de aprovação de faixas foi alterado de 20.000 Hz para **19.000 Hz**. 
+*Justificativa:* Faixas com conteúdo espectral sustentado até ~19–20 kHz não devem ser invalidadas. A dinâmica natural das masterizações costuma apresentar caimento nessa região, e o conteúdo é perceptualmente banda cheia. O método de janela grande com Média (A-Streaming) garante que picos isolados não interfiram na aprovação, exigindo conteúdo *sustentado*.
+*Limitação Conhecida (Trabalho Futuro):* Arquivos MP3 em alta taxa (256–320 kbps) também costumam cortar próximo de 19,5 kHz, logo, arquivos WAV convertidos a partir desses MP3 passarão no novo limiar. No futuro, será desenvolvida uma heurística para analisar a **inclinação (slope)** do corte — já que um corte de compressão tende a ser um degrau abrupto, enquanto uma atenuação de mixagem/masterização é gradual.

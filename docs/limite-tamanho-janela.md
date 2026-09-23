@@ -34,17 +34,16 @@ Onde `maxPsd` é o **pico de energia global** do que foi examinado.
 
 Como a amostragem sorteia trechos diferentes, o pico global medido na amostra varia (o denominador flutua). Ao flutuar a referência de teto, a linha de corte "dança" para cima e para baixo. Se a amostra, por acaso, pegar as partes mais graves, a linha de corte desce, e o ruído agudo natural (dither) cruza o limiar gerando um **falso positivo**.
 
-**Evidência Experimental (Gin e Juice):**
-Ao testar a mesma faixa com diferentes números de janelas, não houve convergência para o valor exato (20.126 Hz da Análise Completa), mas sim forte oscilação induzida pelo sorteio:
-- 80 janelas: 20.449,1 Hz
-- 120 janelas: 22.049,3 Hz
-- 160 janelas: 16.464,2 Hz (Gerou um **Falso Positivo**)
-- 240 janelas: 22.049,3 Hz
+## Evidência Experimental (F-80 vs A-Streaming)
+
+O método F-80 (80 janelas, média) foi testado contra o A-Streaming sobre a biblioteca completa. Embora o erro com 80 janelas seja menor do que com 40 janelas (onde a superestimação chegava a 5.6 kHz), o F-80 continua **superestimando** o espectro, nunca subestimando as faixas aprovadas.
+
+Isso significa que o F-80 pode aprovar faixas que na verdade não atingem os 19 kHz exigidos (Falsos Positivos p/ 19k+). Um exemplo concreto dessa falha foi registrado:
+- **Exemplo de Falha do F-80:** Ocorreu um caso extremo em que uma faixa reprovada no A-Streaming obteve `maxF_for_BelowA = 21829.3 Hz` no F-80.
+Isso prova que o F-80 não é estatisticamente seguro para aprovar faixas em nenhuma hipótese.
 
 ## Conclusão e Diretriz de Produto
 
 1. **Janela Intacta:** A janela de FFT de 65536 permanece intocada, pois a redução corrompe o SNR por bin de frequência.
-2. **Triagem em Dois Estágios:** Devido à instabilidade do limiar relativo, o aplicativo não expõe livre escolha de amostragem. Em vez disso, ele usa uma arquitetura de triagem condicional:
-   - **Estágio 1 (Rápido):** Amostra o arquivo. Se apontar Corte Claro (< 18 kHz) ou Banda Cheia (> 21.5 kHz), aceitamos o veredito direto com segurança estatística.
-   - **Estágio 2 (Completo):** Se cair na zona limítrofe (18k - 21.5k), o motor automaticamente engatilha uma Análise Completa (Streaming), eliminando a variabilidade do denominador.
-3. **A-Streaming:** A Análise Completa, agora feita por leitura em blocos (streaming), mantém identidade bit-a-bit com o algoritmo original carregando a faixa 100%, mas custando apenas poucos megabytes na memória, o que resolve os travamentos que antes destruíam o SO por excesso de Garbage Collection e paginação.
+2. **Abandono da Triagem:** A ideia de usar o F-80 como "Estágio 1" para reprovação prévia foi desativada no caminho de produção. Testes de performance revelaram que rodar o F-80 e depois o A-Streaming para as exceções é, na média, **mais lento** do que simplesmente rodar o A-Streaming em tudo desde o início, devido à altíssima eficiência alcançada pela nova implementação.
+3. **A-Streaming Definitivo:** O A-Streaming agora é o motor único e definitivo. Com otimizações agressivas de reuso de buffer de memória para o FFT (evitando alocações a cada janela e pressão no Garbage Collector), a leitura em streaming por blocos atinge performance insuperável mantendo exatidão matemática irretocável em relação ao método original de carregamento completo, consumindo pouquíssima RAM.

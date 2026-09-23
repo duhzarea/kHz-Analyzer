@@ -26,7 +26,7 @@ public static class CsvReport
             string sr = r.Erro != null ? "-" : r.SampleRate.ToString("N0", culture) + " Hz";
             string bits = r.Erro != null ? "-" : r.Bits.ToString();
             string freq = r.Erro != null ? "-" : r.FreqMaximaDetectada.ToString("N0", culture) + " Hz";
-            string veredito = r.Erro != null ? r.Erro : (r.EhOk ? "Chega em 20 kHz+" : r.Veredito);
+            string veredito = r.Erro != null ? r.Erro : (r.EhOk ? "Chega em 19 kHz+" : r.Veredito);
             
             sw.WriteLine($"{Escape(faixa)};{Escape(key)};{Escape(bpm)};{Escape(formato)};{Escape(sr)};{Escape(bits)};{Escape(freq)};{Escape(veredito)}");
         }

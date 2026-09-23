@@ -24,7 +24,7 @@
                 <TextBlock
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Style="{StaticResource BodyTextBlockStyle}"
-                    Text="Verifica se cada faixa tem conteúdo espectral real até 20 kHz." />
+                    Text="Verifica se cada faixa tem conteúdo espectral real até 19 kHz." />
             </StackPanel>
 
             <Grid ColumnSpacing="10">
@@ -146,7 +146,7 @@
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="ABAIXO DE 20 kHz" />
+                        Text="ABAIXO DE 19 kHz" />
                     <TextBlock
                         x:Name="AbaixoText"
                         Foreground="#E04A3F"

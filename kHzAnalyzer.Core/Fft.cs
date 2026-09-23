@@ -99,7 +99,7 @@ public static class Fft
         return (freqs, psd);
     }
 
-    public static double[] Periodogram(float[] signal, int sampleRate, double[] window)
+    public static void Periodogram(float[] signal, int sampleRate, double[] window, Complex[] buffer, double[] psdOut)
     {
         int segLen = signal.Length;
         double windowPowerSum = 0;
@@ -107,22 +107,18 @@ public static class Fft
         if (windowPowerSum <= 0) windowPowerSum = 1;
 
         int bins = segLen / 2 + 1;
-        var buffer = new Complex[segLen];
         for (int i = 0; i < segLen; i++)
             buffer[i] = new Complex(signal[i] * window[i], 0);
 
         Transform(buffer);
 
-        var psd = new double[bins];
         for (int k = 0; k < bins; k++)
         {
             double mag = buffer[k].Magnitude;
             double power = (mag * mag) / (sampleRate * windowPowerSum);
             if (k > 0 && k < bins - 1) power *= 2; 
-            psd[k] = power;
+            psdOut[k] = power;
         }
-
-        return psd;
     }
 
     public static double[] Rfftfreq(int windowSize, double d)
