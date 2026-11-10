@@ -28,13 +28,19 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Download &amp; Trim" />
+                <TextBlock TextWrapping="Wrap" Text="Paste a YouTube or SoundCloud link and select Get info to see the title and length. Choose WAV, M4A, MP3 or MP4 video, optionally type start and end times, then select Download. Only download material you have the right to use." />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Privacy" />
-                <TextBlock TextWrapping="Wrap" Text="Everything runs on this computer. No audio, file name or path is sent anywhere." />
+                <TextBlock TextWrapping="Wrap" Text="Analysis runs entirely on this computer. No audio, file name or path is sent anywhere. Download &amp; Trim connects only to the site of the link you paste." />
             </StackPanel>
 
             <StackPanel Spacing="8">
                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Third-party software" />
                 <TextBlock TextWrapping="Wrap" Text="Inter typeface (SIL Open Font License 1.1). SQLite (public domain). Windows App SDK and .NET (MIT License)." />
+                <TextBlock TextWrapping="Wrap" Text="Download &amp; Trim uses two separate programs kept in the app's tools folder: FFmpeg (GPL version 3 build by gyan.dev, source at ffmpeg.org) and yt-dlp (The Unlicense, github.com/yt-dlp/yt-dlp). Their licence texts are in that folder." />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

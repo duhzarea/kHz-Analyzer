@@ -18,12 +18,58 @@ static class Program
     static readonly string[] Ext = { ".wav", ".aiff", ".aif" };
     static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
+    static async Task<int> Baixar(string[] a)
+    {
+        try
+        {
+            var info = await KhzAnalyzer.Core.Media.MediaDownloader.FetchInfoAsync(a[1], CancellationToken.None);
+            Console.WriteLine($"title=[{info.Title}] uploader=[{info.Uploader}] duration={info.DurationSeconds} thumb={(info.ThumbnailUrl is null ? "no" : "yes")}");
+
+            KhzAnalyzer.Core.Media.MediaDownloader.TryParseTime(a.Length > 4 ? a[4] : null, out var ini);
+            KhzAnalyzer.Core.Media.MediaDownloader.TryParseTime(a.Length > 5 ? a[5] : null, out var fim);
+            double ultimo = -100;
+            var progresso = new SyncProgress(p =>
+            {
+                if (p.Percent is { } v && v - ultimo < 20 && v < 100) return;
+                if (p.Percent is { } w) ultimo = w;
+                Console.WriteLine($"  {p.Percent?.ToString("F0", CultureInfo.InvariantCulture) ?? "--"}% {p.Stage}: {p.Line}");
+            });
+            var sw = Stopwatch.StartNew();
+            string caminho = await KhzAnalyzer.Core.Media.MediaDownloader.DownloadAsync(new KhzAnalyzer.Core.Media.DownloadRequest
+            {
+                Url = a[1],
+                Format = Enum.Parse<KhzAnalyzer.Core.Media.ExportFormat>(a[2], ignoreCase: true),
+                DestinationFolder = a[3],
+                FileName = info.Title,
+                Start = ini,
+                End = fim,
+                SourceDurationSeconds = info.DurationSeconds,
+            }, progresso, CancellationToken.None);
+            Console.WriteLine($"saved=[{caminho}] bytes={new FileInfo(caminho).Length} in {sw.Elapsed.TotalSeconds:F1}s");
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAILED: {ex.GetType().Name}: {ex.Message}");
+            return 1;
+        }
+    }
+
+    sealed class SyncProgress(Action<KhzAnalyzer.Core.Media.DownloadProgress> f) : IProgress<KhzAnalyzer.Core.Media.DownloadProgress>
+    {
+        public void Report(KhzAnalyzer.Core.Media.DownloadProgress value) => f(value);
+    }
+
     static int Main(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
 
         if (args.Length >= 2 && args[0] == "--verificar")
             return Verificar(args[1]);
+
+        // --baixar <url> <wav|m4a|mp3|mp4> <folder> [start] [end]   exercises Download & Trim without the UI
+        if (args.Length >= 4 && args[0] == "--baixar")
+            return Baixar(args).GetAwaiter().GetResult();
 
         if (args.Length >= 1 && Directory.Exists(args[0]))
             return Listar(args[0]);
@@ -374,7 +420,7 @@ static class Program
                     freqMax = freqs[i];
         }
 
-        freqMax = Math.Round(freqMax, 1);
-        return (freqMax, freqMax >= SpectrumAnalyzer.FreqAlvo ? "OK" : "ABAIXO");
+        string status = freqMax >= SpectrumAnalyzer.FreqAlvo ? "OK" : "ABAIXO";
+        return (Math.Round(freqMax, 1), status);
     }
 }

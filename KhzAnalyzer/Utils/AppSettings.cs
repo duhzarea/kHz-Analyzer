@@ -13,6 +13,10 @@ public sealed class AppSettings
 {
     public string Theme { get; set; } = "Light";
 
+    /// <summary>Download &amp; Trim: last folder used, and last format (index in the format list).</summary>
+    public string DownloadFolder { get; set; } = "";
+    public int DownloadFormat { get; set; }
+
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "kHzAnalyzer", "settings.json");
