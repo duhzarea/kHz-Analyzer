@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="KhzAnalyzer.Pages.SnippetsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:KhzAnalyzer.Pages"
+    NavigationCacheMode="Required">
+
+    <Grid Padding="28,20,28,20" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Spacing="2">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Snippets" />
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource BodyTextBlockStyle}"
+                Text="Creates a short MP3 preview of every track that does not have one yet, in a Snippets subfolder next to the track. Originals are never changed."
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <InfoBar
+            x:Name="ToolsMissingBar"
+            Grid.Row="1"
+            IsClosable="False"
+            IsOpen="False"
+            Message="FFmpeg could not be found in the app's &quot;tools&quot; folder or in PATH. Reinstall kHz Analyzer to restore it."
+            Severity="Error"
+            Title="Required tool not found" />
+
+        <!--  Folders  -->
+        <Border
+            Grid.Row="2"
+            Padding="14"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid ColumnSpacing="12" RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="Folders" />
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <Button x:Name="AddFolderButton" Click="AddFolder_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="15" Glyph="&#xE710;" />
+                            <TextBlock Text="Add folder" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        x:Name="RemoveFolderButton"
+                        Click="RemoveFolder_Click"
+                        IsEnabled="False"
+                        ToolTipService.ToolTip="Removes the folder from this list only. Nothing is deleted from disk.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="15" Glyph="&#xE738;" />
+                            <TextBlock Text="Remove from list" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <ListView
+                    x:Name="FolderList"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    MaxHeight="150"
+                    SelectionChanged="FolderList_SelectionChanged"
+                    SelectionMode="Single" />
+                <TextBlock
+                    x:Name="NoFoldersText"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Margin="0,8"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="No folders yet. Select Add folder to choose where your tracks are." />
+            </Grid>
+        </Border>
+
+        <!--  Options  -->
+        <StackPanel
+            x:Name="OptionsPanel"
+            Grid.Row="3"
+            Orientation="Horizontal"
+            Spacing="16">
+            <NumberBox
+                x:Name="StartBox"
+                Width="150"
+                Header="Start at (seconds)"
+                Maximum="36000"
+                Minimum="0"
+                SpinButtonPlacementMode="Compact"
+                Value="90" />
+            <NumberBox
+                x:Name="DurationBox"
+                Width="150"
+                Header="Length (seconds)"
+                Maximum="3600"
+                Minimum="5"
+                SpinButtonPlacementMode="Compact"
+                Value="120" />
+            <ComboBox
+                x:Name="BitrateBox"
+                Width="130"
+                Header="MP3 quality"
+                SelectedIndex="1">
+                <ComboBoxItem Content="128 kbps" Tag="128" />
+                <ComboBoxItem Content="192 kbps" Tag="192" />
+                <ComboBoxItem Content="256 kbps" Tag="256" />
+                <ComboBoxItem Content="320 kbps" Tag="320" />
+            </ComboBox>
+            <CheckBox
+                x:Name="RecursiveBox"
+                VerticalAlignment="Bottom"
+                Content="Include subfolders" />
+            <CheckBox
+                x:Name="DryRunBox"
+                VerticalAlignment="Bottom"
+                Content="Preview only (create nothing)" />
+        </StackPanel>
+
+        <!--  Actions + progress  -->
+        <StackPanel Grid.Row="4" Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button
+                    x:Name="RunSelectedButton"
+                    Click="RunSelected_Click"
+                    IsEnabled="False"
+                    Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontSize="15" Glyph="&#xE768;" />
+                        <TextBlock Text="Create for selected folder" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    x:Name="RunAllButton"
+                    Click="RunAll_Click"
+                    IsEnabled="False">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontSize="15" Glyph="&#xE8B3;" />
+                        <TextBlock Text="Create for all folders" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    x:Name="CancelButton"
+                    Click="Cancel_Click"
+                    IsEnabled="False">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontSize="15" Glyph="&#xE711;" />
+                        <TextBlock Text="Cancel" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <ProgressBar
+                x:Name="Progress"
+                Foreground="{ThemeResource SuccessBrush}"
+                Maximum="1"
+                Minimum="0"
+                Value="0" />
+            <TextBlock
+                x:Name="StatusText"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="Ready."
+                TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+
+        <!--  Results  -->
+        <Border
+            Grid.Row="5"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <ListView x:Name="ResultList" SelectionMode="None">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="16,6" />
+                        <Setter Property="MinHeight" Value="36" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:SnippetRow">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{x:Bind Brush}"
+                                Glyph="{x:Bind Glyph}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="{x:Bind Name}"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTipService.ToolTip="{x:Bind Path}" />
+                            <TextBlock
+                                Grid.Column="2"
+                                Foreground="{x:Bind Brush}"
+                                Text="{x:Bind Message}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+    </Grid>
+</Page>

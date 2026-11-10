@@ -33,6 +33,11 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Snippets" />
+                <TextBlock TextWrapping="Wrap" Text="Add the folders where your tracks are. For every track without a preview, a cut (by default 2 minutes starting at 1:30) is saved as MP3 in a Snippets subfolder next to it. Tracks that already have a file in Snippets, Snippet, Preview or Previews are skipped, and folders with BACKUP in the name are ignored. Use Preview only to see what would be created." />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Privacy" />
                 <TextBlock TextWrapping="Wrap" Text="Analysis runs entirely on this computer. No audio, file name or path is sent anywhere. Download &amp; Trim connects only to the site of the link you paste." />
             </StackPanel>

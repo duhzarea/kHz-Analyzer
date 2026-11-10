@@ -72,7 +72,7 @@ public sealed partial class MainWindow : Window
                 NavFrame.Navigate(typeof(DownloadPage));
                 break;
             case "snippets":
-                NavFrame.Navigate(typeof(ComingSoonPage), item.Tag);
+                NavFrame.Navigate(typeof(SnippetsPage));
                 break;
             case "about":
                 NavFrame.Navigate(typeof(AboutPage));

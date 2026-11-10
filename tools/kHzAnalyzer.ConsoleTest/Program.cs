@@ -55,6 +55,14 @@ static class Program
         }
     }
 
+    sealed class SnippetLog : IProgress<KhzAnalyzer.Core.Media.SnippetProgress>
+    {
+        public void Report(KhzAnalyzer.Core.Media.SnippetProgress p)
+        {
+            if (p.Finished is { } e) Console.WriteLine($"  [{p.Done}/{p.Total}] {e.Outcome}: {e.OutputPath} ({e.Message})");
+        }
+    }
+
     sealed class SyncProgress(Action<KhzAnalyzer.Core.Media.DownloadProgress> f) : IProgress<KhzAnalyzer.Core.Media.DownloadProgress>
     {
         public void Report(KhzAnalyzer.Core.Media.DownloadProgress value) => f(value);
@@ -66,6 +74,21 @@ static class Program
 
         if (args.Length >= 2 && args[0] == "--verificar")
             return Verificar(args[1]);
+
+        // --snippets <folder> [--recursivo] [--simular]   exercises the Snippets generator without the UI
+        if (args.Length >= 2 && args[0] == "--snippets")
+        {
+            try
+            {
+                var prog = new SnippetLog();
+                var r = KhzAnalyzer.Core.Media.SnippetGenerator.RunAsync(new[] { args[1] },
+                    new KhzAnalyzer.Core.Media.SnippetOptions { Recursive = args.Contains("--recursivo"), DryRun = args.Contains("--simular") },
+                    prog, CancellationToken.None).GetAwaiter().GetResult();
+                Console.WriteLine($"created={r.Created} existed={r.AlreadyExisted} failed={r.Failed} dry={r.DryRun}");
+                return 0;
+            }
+            catch (Exception ex) { Console.WriteLine($"FAILED: {ex.Message}"); return 1; }
+        }
 
         // --baixar <url> <wav|m4a|mp3|mp4> <folder> [start] [end]   exercises Download & Trim without the UI
         if (args.Length >= 4 && args[0] == "--baixar")

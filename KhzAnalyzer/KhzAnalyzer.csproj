@@ -19,7 +19,7 @@
     <EnableWinAppRunSupport>false</EnableWinAppRunSupport>
     <AssemblyName>kHzAnalyzer</AssemblyName>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
-    <Version>0.10.0</Version>
+    <Version>0.11.0</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

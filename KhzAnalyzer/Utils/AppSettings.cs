@@ -17,6 +17,13 @@ public sealed class AppSettings
     public string DownloadFolder { get; set; } = "";
     public int DownloadFormat { get; set; }
 
+    /// <summary>Snippets: saved folder list and last options.</summary>
+    public System.Collections.Generic.List<string> SnippetFolders { get; set; } = new();
+    public int SnippetStart { get; set; } = 90;
+    public int SnippetDuration { get; set; } = 120;
+    public int SnippetBitrate { get; set; } = 192;
+    public bool SnippetRecursive { get; set; }
+
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "kHzAnalyzer", "settings.json");
