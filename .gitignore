@@ -43,3 +43,8 @@ tools/FontInspector/obj/
 
 # Distribuicao completa de fontes (apenas os TTF em Assets/Fonts entram)
 Inter/
+
+# Local-only files (library track names, backups, personal briefing)
+docs/handoff/verificacao.txt
+*.bak
+Super kHz.txt

@@ -36,9 +36,11 @@ Como a amostragem sorteia trechos diferentes, o pico global medido na amostra va
 
 ## Evidência Experimental (F-80 vs A-Streaming)
 
-O método F-80 (80 janelas, média) foi testado contra o A-Streaming sobre a biblioteca completa. Embora o erro com 80 janelas seja menor do que com 40 janelas (onde a superestimação chegava a 5.6 kHz), o F-80 continua **superestimando** o espectro, nunca subestimando as faixas aprovadas.
+O método F-80 (80 janelas, média) foi testado contra o A-Streaming sobre a biblioteca completa. O erro não tem limite conhecido e ocorre nos dois sentidos: na série de *Gin e Juice*, a amostragem com 160 janelas deu 16.464 Hz contra 20.126 Hz do método completo (subestimação de 3,6 kHz); com 40 janelas, *Crazy* deu 21.662 Hz contra 16.229 Hz (superestimação de 5,4 kHz).
 
-Isso significa que o F-80 pode aprovar faixas que na verdade não atingem os 19 kHz exigidos (Falsos Positivos p/ 19k+). Um exemplo concreto dessa falha foi registrado:
+Terminologia usada no projeto: **falso negativo** = a amostragem APROVA o que o método completo REPROVA (o erro perigoso, deixa passar um master cortado); **falso positivo** = a amostragem reprova o que o método completo aprova.
+
+O F-80 pode aprovar faixas que na verdade não atingem os 19 kHz exigidos, ou seja, produz **falsos negativos**. Um exemplo concreto dessa falha foi registrado:
 - **Exemplo de Falha do F-80:** Ocorreu um caso extremo em que uma faixa reprovada no A-Streaming obteve `maxF_for_BelowA = 21829.3 Hz` no F-80.
 Isso prova que o F-80 não é estatisticamente seguro para aprovar faixas em nenhuma hipótese.
 
