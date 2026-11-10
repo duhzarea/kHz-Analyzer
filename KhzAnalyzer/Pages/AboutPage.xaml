@@ -2,22 +2,40 @@
 <Page
     x:Class="KhzAnalyzer.Pages.AboutPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:KhzAnalyzer.Pages"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid Padding="24,16,24,16" RowSpacing="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Sobre" />
-        
-        <StackPanel Grid.Row="1" Spacing="16">
-            <TextBlock Text="kHz Analyzer - Verificador de espectro de áudio" />
-            <Button Content="Abrir pasta de logs" Click="AbrirLogs_Click" />
+    <ScrollViewer>
+        <StackPanel MaxWidth="720" Padding="28,20,28,28" HorizontalAlignment="Left" Spacing="20">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="About" />
+
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="kHz Analyzer" />
+                <TextBlock x:Name="VersionText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Created by DUHZZ. Free to use." />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="What the Analyzer checks" />
+                <TextBlock TextWrapping="Wrap" Text="Each WAV or AIFF file is read from start to finish. A track passes when it has sustained spectral content up to 19 kHz or more. A track that stops lower was most likely made from a lossy source, such as an MP3 saved again as WAV." />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="How to use it" />
+                <TextBlock TextWrapping="Wrap" Text="1. Open Analyzer and choose a folder. Subfolders are included." />
+                <TextBlock TextWrapping="Wrap" Text="2. Select Analyze. Results appear as each track finishes, and a folder that was analyzed before opens almost instantly." />
+                <TextBlock TextWrapping="Wrap" Text="3. Use Issues to see only the tracks that did not pass." />
+                <TextBlock TextWrapping="Wrap" Text="4. Select Export to save a .docx and a .csv report." />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Privacy" />
+                <TextBlock TextWrapping="Wrap" Text="Everything runs on this computer. No audio, file name or path is sent anywhere." />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Third-party software" />
+                <TextBlock TextWrapping="Wrap" Text="Inter typeface (SIL Open Font License 1.1). SQLite (public domain). Windows App SDK and .NET (MIT License)." />
+            </StackPanel>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Page>

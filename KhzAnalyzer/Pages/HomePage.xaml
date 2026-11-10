@@ -20,11 +20,11 @@
         <!--  Cabeçalho: título + seleção de pasta  -->
         <StackPanel Grid.Row="0" Spacing="14">
             <StackPanel Spacing="2">
-                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Biblioteca" />
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Analyzer" />
                 <TextBlock
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Style="{StaticResource BodyTextBlockStyle}"
-                    Text="Verifica se cada faixa tem conteúdo espectral real até 19 kHz." />
+                    Text="Checks whether each track has real spectral content up to 19 kHz." />
             </StackPanel>
 
             <Grid ColumnSpacing="10">
@@ -39,7 +39,7 @@
                 <TextBox
                     x:Name="PastaTextBox"
                     Grid.Column="0"
-                    PlaceholderText="Cole aqui o caminho da pasta, ou use Procurar…" />
+                    PlaceholderText="Paste a folder path here, or use Browse…" />
 
                 <Button
                     x:Name="ProcurarButton"
@@ -47,7 +47,7 @@
                     Click="ProcurarButton_Click">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="15" Glyph="&#xE838;" />
-                        <TextBlock Text="Procurar" />
+                        <TextBlock Text="Browse" />
                     </StackPanel>
                 </Button>
 
@@ -58,7 +58,7 @@
                     Style="{StaticResource AccentButtonStyle}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="15" Glyph="&#xE768;" />
-                        <TextBlock Text="Analisar" />
+                        <TextBlock Text="Analyze" />
                     </StackPanel>
                 </Button>
 
@@ -69,7 +69,7 @@
                     IsEnabled="False">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="15" Glyph="&#xE711;" />
-                        <TextBlock Text="Cancelar" />
+                        <TextBlock Text="Cancel" />
                     </StackPanel>
                 </Button>
 
@@ -80,7 +80,7 @@
                     IsEnabled="False">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="15" Glyph="&#xE74E;" />
-                        <TextBlock Text="Exportar" />
+                        <TextBlock Text="Export" />
                     </StackPanel>
                 </Button>
             </Grid>
@@ -126,7 +126,7 @@
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="APROVADAS" />
+                        Text="PASSED" />
                     <TextBlock
                         x:Name="OkText"
                         Foreground="#2EA043"
@@ -146,7 +146,7 @@
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="ABAIXO DE 19 kHz" />
+                        Text="BELOW 19 kHz" />
                     <TextBlock
                         x:Name="AbaixoText"
                         Foreground="#E04A3F"
@@ -166,7 +166,7 @@
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="ERROS" />
+                        Text="ERRORS" />
                     <TextBlock
                         x:Name="ErroText"
                         Foreground="#F59E0B"
@@ -186,7 +186,7 @@
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="NÃO BAIXADOS" />
+                        Text="NOT DOWNLOADED" />
                     <TextBlock
                         x:Name="OfflineText"
                         Foreground="#8B8B8B"
@@ -207,7 +207,7 @@
                 x:Name="StatusText"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 Style="{StaticResource CaptionTextBlockStyle}"
-                Text="Pronto." />
+                Text="Ready." />
         </StackPanel>
 
         <!--  Filtros + busca  -->
@@ -224,19 +224,19 @@
                 <RadioButton
                     x:Name="FiltroTodos"
                     Checked="Filtro_Changed"
-                    Content="Todas"
+                    Content="All"
                     GroupName="Filtro"
                     IsChecked="True"
                     Style="{StaticResource DefaultRadioButtonStyle}" />
                 <RadioButton
                     x:Name="FiltroOk"
                     Checked="Filtro_Changed"
-                    Content="Aprovadas"
+                    Content="Passed"
                     GroupName="Filtro" />
                 <RadioButton
                     x:Name="FiltroProblemas"
                     Checked="Filtro_Changed"
-                    Content="Problemas"
+                    Content="Issues"
                     GroupName="Filtro" />
             </StackPanel>
 
@@ -244,7 +244,7 @@
                 x:Name="BuscaBox"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
-                PlaceholderText="Buscar faixa…"
+                PlaceholderText="Search tracks…"
                 QueryIcon="Find"
                 TextChanged="BuscaBox_TextChanged" />
         </Grid>
@@ -282,7 +282,7 @@
                     <TextBlock
                         Grid.Column="1"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="FAIXA" />
+                        Text="TRACK" />
                     <TextBlock
                         Grid.Column="2"
                         Style="{StaticResource CaptionTextBlockStyle}"
@@ -294,7 +294,7 @@
                     <TextBlock
                         Grid.Column="4"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="FORMATO" />
+                        Text="FORMAT" />
                     <TextBlock
                         Grid.Column="5"
                         Style="{StaticResource CaptionTextBlockStyle}"
@@ -306,11 +306,11 @@
                     <TextBlock
                         Grid.Column="7"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="FREQ. MÁX." />
+                        Text="MAX FREQ." />
                     <TextBlock
                         Grid.Column="8"
                         Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="VEREDITO" />
+                        Text="VERDICT" />
                 </Grid>
 
                 <ListView

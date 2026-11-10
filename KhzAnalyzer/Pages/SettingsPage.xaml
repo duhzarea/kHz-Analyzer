@@ -2,18 +2,32 @@
 <Page
     x:Class="KhzAnalyzer.Pages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:KhzAnalyzer.Pages"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid Padding="24,16,24,16" RowSpacing="24">
+    <Grid Padding="28,20,28,20" RowSpacing="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Settings" />
-        <TextBlock Grid.Row="1" Text="This is the Settings page" />
+
+        <StackPanel Grid.Row="1" MaxWidth="640" HorizontalAlignment="Left" Spacing="24">
+            <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Appearance" />
+                <RadioButtons x:Name="ThemeChoice" SelectionChanged="ThemeChoice_SelectionChanged">
+                    <RadioButton Content="Light" Tag="Light" />
+                    <RadioButton Content="Dark" Tag="Dark" />
+                </RadioButtons>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Troubleshooting" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Logs stay on this computer. Nothing is ever sent anywhere."
+                    TextWrapping="Wrap" />
+                <Button Click="OpenLogs_Click" Content="Open logs folder" />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>

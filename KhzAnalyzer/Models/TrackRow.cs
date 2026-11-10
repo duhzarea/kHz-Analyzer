@@ -23,6 +23,13 @@ public sealed class TrackRow
     public SolidColorBrush StatusBrush { get; init; } = new(Colors.Gray);
     public StatusFaixa Status { get; init; }
 
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    private static bool EhVazio(string caminho)
+    {
+        try { return new System.IO.FileInfo(caminho).Length == 0; } catch { return false; }
+    }
+
     public static TrackRow FromResult(AnalysisResult r)
     {
         var (key, bpm, faixa) = TrackNameParser.Parse(r.Arquivo);
@@ -40,7 +47,7 @@ public sealed class TrackRow
                 SampleRate = "—",
                 Bits = "—",
                 FreqMax = "—",
-                Veredito = r.Erro ?? "Erro desconhecido",
+                Veredito = r.Erro ?? "Unknown error",
                 StatusGlyph = "\uE753",
                 StatusBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 0x8B, 0x8B, 0x8B)),
                 Status = StatusFaixa.Offline,
@@ -59,7 +66,7 @@ public sealed class TrackRow
                 SampleRate = "—",
                 Bits = "—",
                 FreqMax = "—",
-                Veredito = r.Veredito ?? "",
+                Veredito = EhVazio(r.Arquivo) ? "Empty file (0 bytes)" : $"Could not read: {r.Erro}",
                 StatusGlyph = "\uEA39",
                 StatusBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 0xF5, 0x9E, 0x0B)),
                 Status = StatusFaixa.Erro,
@@ -74,10 +81,10 @@ public sealed class TrackRow
             Key = string.IsNullOrEmpty(key) ? "—" : key,
             Bpm = string.IsNullOrEmpty(bpm) ? "—" : bpm,
             Formato = formato,
-            SampleRate = $"{r.SampleRate:N0} Hz",
+            SampleRate = string.Create(Inv, $"{r.SampleRate:N0} Hz"),
             Bits = $"{r.Bits} bit",
-            FreqMax = $"{r.FreqMaximaDetectada:N0} Hz",
-            Veredito = ok ? "Chega em 19 kHz+" : r.Veredito,
+            FreqMax = string.Create(Inv, $"{r.FreqMaximaDetectada:N0} Hz"),
+            Veredito = ok ? "Reaches 19 kHz+" : "Below 19 kHz",
             StatusGlyph = ok ? "\uE73E" : "\uE7BA",
             StatusBrush = ok
                 ? new SolidColorBrush(ColorHelper.FromArgb(255, 0x2E, 0xA0, 0x43))

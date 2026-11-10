@@ -19,6 +19,9 @@ namespace KhzAnalyzer;
 public partial class App : Application
 {
     private Window? _window;
+
+    /// <summary>The single app window. Pages use it to switch the theme.</summary>
+    public static MainWindow? MainWindow { get; private set; }
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -26,6 +29,11 @@ public partial class App : Application
     /// </summary>
     public App()
     {
+        // English-only UI (spec v2.1): keeps built-in control texts such as "Settings"
+        // in English even when Windows runs in another language.
+        try { Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US"; }
+        catch (Exception ex) { Logger.Log($"Could not set the UI language: {ex.Message}"); }
+
         InitializeComponent();
         
         this.UnhandledException += App_UnhandledException;
@@ -65,7 +73,9 @@ public partial class App : Application
             this.Resources["DurationSlowKeyTime"] = zeroTime;
         }
 
-        _window = new MainWindow();
-        _window.Activate();
+        var janela = new MainWindow();
+        _window = janela;
+        MainWindow = janela;
+        janela.Activate();
     }
 }

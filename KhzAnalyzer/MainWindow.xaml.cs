@@ -1,12 +1,12 @@
+using System;
+using System.IO;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Composition.SystemBackdrops;
 using KhzAnalyzer.Pages;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using KhzAnalyzer.Utils;
 
 namespace KhzAnalyzer;
 
@@ -16,21 +16,36 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
 
-        if (MicaController.IsSupported())
-        {
-            SystemBackdrop = new MicaBackdrop();
-            RootGrid.Background = null;
-        }
-        else if (DesktopAcrylicController.IsSupported())
+        // Glass: acrylic first (spec v2.1), Mica where acrylic is unavailable,
+        // and the opaque fallback brush of RootGrid when neither exists.
+        if (DesktopAcrylicController.IsSupported())
         {
             SystemBackdrop = new DesktopAcrylicBackdrop();
+            RootGrid.Background = null;
+        }
+        else if (MicaController.IsSupported())
+        {
+            SystemBackdrop = new MicaBackdrop();
             RootGrid.Background = null;
         }
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-        AppWindow.SetIcon("Assets/AppIcon.ico");
+
+        // Absolute path: an unpackaged app can be started with any working directory.
+        string icone = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
+        if (File.Exists(icone)) AppWindow.SetIcon(icone);
+
+        ApplyTheme(AppSettings.Current.Theme);
+    }
+
+    /// <summary>Applies "Light" or "Dark" to the whole window, title bar buttons included.</summary>
+    public void ApplyTheme(string theme)
+    {
+        bool dark = string.Equals(theme, "Dark", StringComparison.OrdinalIgnoreCase);
+        RootGrid.RequestedTheme = dark ? ElementTheme.Dark : ElementTheme.Light;
+        AppWindow.TitleBar.PreferredTheme = dark ? TitleBarTheme.Dark : TitleBarTheme.Light;
     }
 
     private void TitleBar_PaneToggleRequested(TitleBar sender, object args)
@@ -38,30 +53,28 @@ public sealed partial class MainWindow : Window
         NavView.IsPaneOpen = !NavView.IsPaneOpen;
     }
 
-    private void TitleBar_BackRequested(TitleBar sender, object args)
-    {
-        NavFrame.GoBack();
-    }
-
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         if (args.IsSettingsSelected)
         {
             NavFrame.Navigate(typeof(SettingsPage));
+            return;
         }
-        else if (args.SelectedItem is NavigationViewItem item)
+
+        if (args.SelectedItem is not NavigationViewItem item) return;
+
+        switch (item.Tag as string)
         {
-            switch (item.Tag)
-            {
-                case "home":
-                    NavFrame.Navigate(typeof(HomePage));
-                    break;
-                case "about":
-                    NavFrame.Navigate(typeof(AboutPage));
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unknown navigation item tag: {item.Tag}");
-            }
+            case "analyzer":
+                NavFrame.Navigate(typeof(HomePage));
+                break;
+            case "download":
+            case "snippets":
+                NavFrame.Navigate(typeof(ComingSoonPage), item.Tag);
+                break;
+            case "about":
+                NavFrame.Navigate(typeof(AboutPage));
+                break;
         }
     }
 }

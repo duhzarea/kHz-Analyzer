@@ -102,4 +102,18 @@ FFmpeg, yt-dlp, SQLite).
 4. Snippets.
 5. About and Settings.
 6. Single-file spectrogram and waveform.
-7. Installer (MSIX and portable build) and GitHub release.
+7. Installer and GitHub release.
+
+## 11. Installation (decided 2026-11-10)
+
+- The owner must be able to install to **any folder on any drive** (G:, K:, Y: ...).
+  MSIX always installs to a fixed system location, so MSIX is dropped.
+- The app is built **unpackaged and self-contained** (`WindowsPackageType=None`,
+  `WindowsAppSDKSelfContained=true`, .NET self-contained). Nothing has to be installed first.
+- Two deliverables per release, both x64:
+  1. **Portable zip** - extract anywhere and run `kHzAnalyzer.exe`.
+  2. **Setup program** (Inno Setup) with a "choose destination folder" page, Start menu
+     and optional desktop shortcut, and an uninstaller. Per-user by default, so installing
+     to a folder the user owns needs no administrator rights.
+- User data never lives in the install folder: settings and logs in
+  `%LOCALAPPDATA%\kHzAnalyzer`, analysis cache in `%APPDATA%\kHzAnalyzer`.

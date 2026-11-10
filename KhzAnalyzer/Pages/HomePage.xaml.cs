@@ -47,7 +47,7 @@ public sealed partial class HomePage : Page
         {
             // Se o seletor falhar por qualquer motivo, o campo de texto continua
             // sendo um caminho válido de entrada — o usuário pode colar o caminho.
-            StatusText.Text = $"Não foi possível abrir o seletor de pasta ({ex.Message}). Cole o caminho no campo ao lado.";
+            StatusText.Text = $"Could not open the folder picker ({ex.Message}). Paste the path into the field instead.";
         }
     }
 
@@ -59,7 +59,7 @@ public sealed partial class HomePage : Page
 
         if (string.IsNullOrWhiteSpace(pasta) || !Directory.Exists(pasta))
         {
-            StatusText.Text = "Escolha uma pasta válida antes de analisar.";
+            StatusText.Text = "Choose a valid folder before analyzing.";
             return;
         }
 
@@ -80,11 +80,11 @@ public sealed partial class HomePage : Page
         }
         catch (OperationCanceledException)
         {
-            StatusText.Text = $"Análise cancelada. {_todos.Count} faixas já analisadas foram mantidas.";
+            StatusText.Text = $"Analysis cancelled. {_todos.Count} tracks already analyzed were kept.";
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Erro inesperado: {ex.Message}";
+            StatusText.Text = $"Unexpected error: {ex.Message}";
         }
         finally
         {
@@ -101,12 +101,12 @@ public sealed partial class HomePage : Page
     {
         _cts?.Cancel();
         CancelarButton.IsEnabled = false;
-        StatusText.Text = "Cancelando…";
+        StatusText.Text = "Cancelling…";
     }
 
     private async Task ExecutarAnaliseAsync(string pasta, CancellationToken token)
     {
-        StatusText.Text = "Procurando arquivos…";
+        StatusText.Text = "Looking for files…";
         Logger.Log($"--- NOVA ANÁLISE ---");
         Logger.Log($"Iniciando enumeração na pasta: {pasta}");
 
@@ -145,7 +145,7 @@ public sealed partial class HomePage : Page
                         if (arquivos.Count % 100 == 0)
                         {
                             DispatcherQueue.TryEnqueue(() => 
-                                StatusText.Text = $"Procurando arquivos… ({arquivos.Count} encontrados)");
+                                StatusText.Text = $"Looking for files… ({arquivos.Count} found)");
                         }
                     }
                 }
@@ -164,14 +164,14 @@ public sealed partial class HomePage : Page
         int total = arquivos.Count + arquivosOffline.Count;
         if (total == 0)
         {
-            StatusText.Text = "Nenhum arquivo .wav ou .aiff encontrado nessa pasta.";
+            StatusText.Text = "No .wav or .aiff files found in this folder.";
             return;
         }
 
         // Adiciona os arquivos offline diretamente na tabela
         foreach (var offline in arquivosOffline)
         {
-            var erroResult = new AnalysisResult { Arquivo = offline, Erro = "Arquivo na nuvem (não baixado)", IsOffline = true };
+            var erroResult = new AnalysisResult { Arquivo = offline, Erro = "Cloud-only file (not downloaded)", IsOffline = true };
             var erroLinha = TrackRow.FromResult(erroResult);
             _todos.Add(erroLinha);
             _resultadosRaw.Add(erroResult);
@@ -260,8 +260,8 @@ public sealed partial class HomePage : Page
         Logger.Log($"Análise concluída em {cronometroAnalise.Elapsed}. Total analisados: {total}");
         
         int analisadosReais = total - arquivosOffline.Count;
-        string avisoOffline = arquivosOffline.Count > 0 ? $" ({arquivosOffline.Count} não baixadas)" : "";
-        StatusText.Text = $"Concluído em {FormatarTempo(cronometroAnalise.Elapsed)} — {analisadosReais} faixas analisadas{avisoOffline}.";
+        string avisoOffline = arquivosOffline.Count > 0 ? $" ({arquivosOffline.Count} not downloaded)" : "";
+        StatusText.Text = $"Done in {FormatarTempo(cronometroAnalise.Elapsed)} — {analisadosReais} tracks analyzed{avisoOffline}.";
     }
 
     private void AtualizarStatus(int feitos, int total, TimeSpan decorrido, string faixaAtual, int offlineCount)
@@ -272,7 +272,7 @@ public sealed partial class HomePage : Page
         {
             double porFaixa = decorrido.TotalSeconds / analisados;
             var restante = TimeSpan.FromSeconds(porFaixa * (total - feitos));
-            eta = $" · restam ~{FormatarTempo(restante)}";
+            eta = $" · ~{FormatarTempo(restante)} left";
         }
 
         StatusText.Text = $"[{feitos}/{total}] {faixaAtual}{eta}";
@@ -280,8 +280,8 @@ public sealed partial class HomePage : Page
 
     private static string FormatarTempo(TimeSpan t) =>
         t.TotalMinutes >= 1
-            ? $"{(int)t.TotalMinutes}min {t.Seconds}s"
-            : $"{t.Seconds}s";
+            ? $"{(int)t.TotalMinutes} min {t.Seconds} s"
+            : $"{t.Seconds} s";
 
     private void AtualizarContadores()
     {
@@ -331,7 +331,7 @@ public sealed partial class HomePage : Page
         string pasta = PastaTextBox.Text?.Trim().Trim('"') ?? "";
         if (string.IsNullOrWhiteSpace(pasta) || _resultadosRaw.Count == 0)
         {
-            StatusText.Text = "Não há resultados para exportar.";
+            StatusText.Text = "There are no results to export.";
             return;
         }
 
@@ -345,7 +345,7 @@ public sealed partial class HomePage : Page
         }
 
         ExportarButton.IsEnabled = false;
-        StatusText.Text = "Gerando relatórios...";
+        StatusText.Text = "Generating reports…";
 
         try
         {
@@ -361,14 +361,14 @@ public sealed partial class HomePage : Page
                 DocxReport.Generate(docxPath, resultados);
             });
 
-            StatusText.Text = "Relatórios .csv e .docx gerados na pasta de análise.";
+            StatusText.Text = "The .csv and .docx reports were saved to the chosen folder.";
             
             // Tenta abrir o documento gerado para o usuário
             try { Process.Start(new ProcessStartInfo(docxPath) { UseShellExecute = true }); } catch { }
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Erro ao exportar: {ex.Message}";
+            StatusText.Text = $"Export failed: {ex.Message}";
         }
         finally
         {
