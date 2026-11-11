@@ -20,9 +20,7 @@
             IsBackButtonVisible="False"
             IsPaneToggleButtonVisible="True"
             PaneToggleRequested="TitleBar_PaneToggleRequested">
-            <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
-            </TitleBar.IconSource>
+            <!--  The icon is set in code: ms-appx URIs need package identity, and this app is unpackaged.  -->
         </TitleBar>
 
         <NavigationView

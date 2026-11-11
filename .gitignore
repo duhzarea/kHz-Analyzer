@@ -48,3 +48,6 @@ Inter/
 docs/handoff/verificacao.txt
 *.bak
 Super kHz.txt
+
+# Reference images from icon banks (licence not checked) - local only
+docs/referencias-icone/

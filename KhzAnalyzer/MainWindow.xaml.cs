@@ -33,9 +33,20 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
 
-        // Absolute path: an unpackaged app can be started with any working directory.
+        // Absolute paths: an unpackaged app can be started with any working directory,
+        // and ms-appx:/// URIs need package identity, which it does not have.
         string icone = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
         if (File.Exists(icone)) AppWindow.SetIcon(icone);
+
+        // The title bar needs a PNG: the WinUI image decoder does not read .ico files.
+        string iconePng = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon-64.png");
+        if (File.Exists(iconePng))
+        {
+            AppTitleBar.IconSource = new ImageIconSource
+            {
+                ImageSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(iconePng)),
+            };
+        }
 
         ApplyTheme(AppSettings.Current.Theme);
     }
