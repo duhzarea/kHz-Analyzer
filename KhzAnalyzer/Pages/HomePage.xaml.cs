@@ -8,14 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using KhzAnalyzer.Core;
 using KhzAnalyzer.Models;
+using KhzAnalyzer.Services;
 using KhzAnalyzer.Utils;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace KhzAnalyzer.Pages;
 
-public sealed partial class HomePage : Page
+public sealed partial class HomePage : Page, IShortcutTarget
 {
     private static readonly string[] Extensoes = { ".wav", ".aiff", ".aif" };
 
@@ -28,6 +31,22 @@ public sealed partial class HomePage : Page
     {
         InitializeComponent();
         ResultadosList.ItemsSource = _visiveis;
+        // ListViewItem keeps Enter for itself; listen to handled events too.
+        ResultadosList.AddHandler(KeyDownEvent, new KeyEventHandler(ResultadosList_KeyDown), true);
+        Player.Instance.QueueProvider = () => _visiveis.ToList();
+        Player.Instance.Failed += msg => StatusText.Text = msg;
+        Player.Instance.TrackChanged += () =>
+        {
+            var cur = Player.Instance.Current;
+            if (cur is not null && _visiveis.Contains(cur)) { ResultadosList.SelectedItem = cur; ResultadosList.ScrollIntoView(cur); }
+        };
+        bool primeira = true;
+        Loaded += (_, _) =>
+        {
+            if (!primeira) return;
+            primeira = false;
+            Motion.Entrance(new UIElement[] { Head, Actions, CardTotal, CardPass, CardBelow, CardErrors, CardOffline, TableCard, RightColumn }, staggerMs: 60);
+        };
     }
 
     // ------------------------------------------------------------ Pasta --
@@ -285,11 +304,11 @@ public sealed partial class HomePage : Page
 
     private void AtualizarContadores()
     {
-        TotalText.Text = _todos.Count.ToString();
-        OkText.Text = _todos.Count(r => r.Status == StatusFaixa.Ok).ToString();
-        AbaixoText.Text = _todos.Count(r => r.Status is StatusFaixa.Abaixo or StatusFaixa.Mp3).ToString();
-        ErroText.Text = _todos.Count(r => r.Status == StatusFaixa.Erro).ToString();
-        OfflineText.Text = _todos.Count(r => r.Status == StatusFaixa.Offline).ToString();
+        Motion.CountTo(TotalText, _todos.Count);
+        Motion.CountTo(OkText, _todos.Count(r => r.Status == StatusFaixa.Ok));
+        Motion.CountTo(AbaixoText, _todos.Count(r => r.Status is StatusFaixa.Abaixo or StatusFaixa.Mp3));
+        Motion.CountTo(ErroText, _todos.Count(r => r.Status == StatusFaixa.Erro));
+        Motion.CountTo(OfflineText, _todos.Count(r => r.Status == StatusFaixa.Offline));
     }
 
     // ---------------------------------------------------- Filtros/busca --
@@ -374,5 +393,98 @@ public sealed partial class HomePage : Page
         {
             ExportarButton.IsEnabled = true;
         }
+    }
+
+    // ------------------------------------------------- Rows: play, info, menu --
+
+    private TrackRow? _menuRow;
+
+    private TrackRow? Selecionada => ResultadosList.SelectedItem as TrackRow;
+
+    private void ResultadosList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        var row = (e.OriginalSource as FrameworkElement)?.DataContext as TrackRow ?? Selecionada;
+        if (row is not null) _ = Player.Instance.PlayAsync(row);
+    }
+
+    private void ResultadosList_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter && Selecionada is { } row)
+        {
+            _ = Player.Instance.PlayAsync(row);
+            e.Handled = true;
+        }
+    }
+
+    private void ResultadosList_SelectionChanged(object sender, SelectionChangedEventArgs e) => MostrarInfo(Selecionada);
+
+    private void MostrarInfo(TrackRow? row)
+    {
+        InfoEmpty.Visibility = row is null ? Visibility.Visible : Visibility.Collapsed;
+        InfoGrid.Visibility = row is null ? Visibility.Collapsed : Visibility.Visible;
+        if (row is null) return;
+        InfoTrack.Text = row.Faixa;
+        InfoFreq.Text = row.FreqMax;
+        InfoRate.Text = row.SampleRate;
+        InfoBits.Text = row.Bits;
+        InfoFormat.Text = row.Formato;
+        InfoBadge.Background = row.BadgeBackground;
+        InfoBadge.BorderBrush = row.BadgeBorder;
+        InfoVerdict.Foreground = row.BadgeForeground;
+        InfoVerdict.Text = row.Veredito;
+    }
+
+    private void RowMenu_Opening(object sender, object e)
+    {
+        _menuRow = ((sender as MenuFlyout)?.Target as FrameworkElement)?.DataContext as TrackRow;
+        if (_menuRow is not null) ResultadosList.SelectedItem = _menuRow;
+    }
+
+    private void MenuPlay_Click(object sender, RoutedEventArgs e) { if (_menuRow is not null) _ = Player.Instance.PlayAsync(_menuRow); }
+    private async void MenuInfo_Click(object sender, RoutedEventArgs e) { if (_menuRow is not null) await TrackDialogs.ShowInfoAsync(XamlRoot, _menuRow); }
+    private async void MenuAnalysis_Click(object sender, RoutedEventArgs e) { if (_menuRow is not null) await TrackDialogs.ShowAnalysisAsync(XamlRoot, _menuRow); }
+
+    private void MenuExplorer_Click(object sender, RoutedEventArgs e)
+    {
+        if (_menuRow is null) return;
+        try { Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_menuRow.CaminhoCompleto}\"") { UseShellExecute = true }); }
+        catch (Exception ex) { StatusText.Text = $"Could not open Explorer: {ex.Message}"; }
+    }
+
+    private void MenuRemove_Click(object sender, RoutedEventArgs e) { if (_menuRow is not null) Remover(_menuRow); }
+
+    private void Remover(TrackRow row)
+    {
+        int idx = _visiveis.IndexOf(row);
+        Player.Instance.StopIf(row);
+        _todos.Remove(row);
+        _visiveis.Remove(row);
+        _resultadosRaw.RemoveAll(r => r.Arquivo == row.CaminhoCompleto);
+        AtualizarContadores();
+        StatusText.Text = $"Removed from the list: {row.Faixa}. The file was not touched.";
+        if (_visiveis.Count > 0) ResultadosList.SelectedIndex = Math.Clamp(idx, 0, _visiveis.Count - 1);
+        else MostrarInfo(null);
+    }
+
+    // ------------------------------------------------------ Shortcuts --
+
+    public bool HandleShortcut(string id)
+    {
+        switch (id)
+        {
+            case Shortcuts.Browse: if (ProcurarButton.IsEnabled) ProcurarButton_Click(this, new RoutedEventArgs()); return true;
+            case Shortcuts.Analyze: if (AnalisarButton.IsEnabled) AnalisarButton_Click(this, new RoutedEventArgs()); return true;
+            case Shortcuts.Cancel: if (CancelarButton.IsEnabled) { CancelarButton_Click(this, new RoutedEventArgs()); return true; } return false;
+            case Shortcuts.Export: if (ExportarButton.IsEnabled) ExportarButton_Click(this, new RoutedEventArgs()); return true;
+            case Shortcuts.Search: BuscaBox.Focus(FocusState.Keyboard); return true;
+            case Shortcuts.TrackInfo:
+                var row = Selecionada ?? Player.Instance.Current;
+                if (row is not null) _ = TrackDialogs.ShowInfoAsync(XamlRoot, row);
+                return row is not null;
+            case Shortcuts.Remove:
+                if (Selecionada is { } sel) { Remover(sel); return true; }
+                return false;
+        }
+        return false;
     }
 }

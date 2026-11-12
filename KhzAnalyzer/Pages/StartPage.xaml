@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="KhzAnalyzer.Pages.StartPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:KhzAnalyzer.Controls"
+    Background="Transparent">
+
+    <Grid Background="{ThemeResource GroundBrush}">
+        <controls:AuroraBackground />
+
+        <Grid Padding="56,8,56,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MaxHeight="40" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Hero  -->
+            <Grid
+                MaxWidth="1240"
+                VerticalAlignment="Center"
+                ColumnSpacing="48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1.1*" MaxWidth="560" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel x:Name="HeroText" VerticalAlignment="Center">
+                    <Grid x:Name="TitleClip">
+                        <TextBlock
+                            x:Name="TitleKhz"
+                            FontFamily="{StaticResource DisplayFontFamily}"
+                            FontSize="128"
+                            Foreground="{ThemeResource InkBrush}"
+                            LineHeight="118"
+                            LineStackingStrategy="BlockLineHeight"
+                            Text="kHz" />
+                    </Grid>
+                    <Grid x:Name="TitleClip2">
+                        <TextBlock
+                            x:Name="TitleAnalyzer"
+                            FontFamily="{StaticResource DisplayFontFamily}"
+                            FontSize="128"
+                            LineHeight="128"
+                            LineStackingStrategy="BlockLineHeight"
+                            Text="Analyzer">
+                            <TextBlock.Foreground>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Offset="0" Color="#FFFF8A9B" />
+                                    <GradientStop Offset="0.45" Color="#FFFA243C" />
+                                    <GradientStop Offset="1" Color="#FFB5102A" />
+                                </LinearGradientBrush>
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                    </Grid>
+                    <TextBlock
+                        x:Name="Tagline"
+                        Margin="4,18,0,0"
+                        FontSize="17"
+                        Foreground="{ThemeResource InkMutedBrush}"
+                        Text="Full bandwidth to 20 kHz, or a warning to check." />
+                </StackPanel>
+
+                <!--  Live spectrum card  -->
+                <Border
+                    x:Name="SpectrumCard"
+                    Grid.Column="1"
+                    Padding="1.5"
+                    VerticalAlignment="Center"
+                    CornerRadius="26">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <LinearGradientBrush.RelativeTransform>
+                                <RotateTransform x:Name="CardSpin" CenterX="0.5" CenterY="0.5" />
+                            </LinearGradientBrush.RelativeTransform>
+                            <GradientStop Offset="0" Color="#FFFA243C" />
+                            <GradientStop Offset="0.4" Color="#FFFACC15" />
+                            <GradientStop Offset="0.7" Color="#FF22D3EE" />
+                            <GradientStop Offset="1" Color="#FFFA243C" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Triggers>
+                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever">
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="CardSpin"
+                                        Storyboard.TargetProperty="Angle"
+                                        From="0"
+                                        To="360"
+                                        Duration="0:0:12" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Border.Triggers>
+                    <Border
+                        Padding="24,22"
+                        Background="{StaticResource DeckBrush}"
+                        CornerRadius="24.5"
+                        RequestedTheme="Dark">
+                        <Grid RowSpacing="14">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="230" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <StackPanel Spacing="4">
+                                    <TextBlock
+                                        CharacterSpacing="160"
+                                        FontFamily="{StaticResource MonoFontFamily}"
+                                        FontSize="12"
+                                        Foreground="#B3FFFFFF"
+                                        Text="LIVE SPECTRUM" />
+                                    <TextBlock FontFamily="{StaticResource MonoFontFamily}" FontSize="14">
+                                        <Run Foreground="#B3FFFFFF" Text="Max freq. " />
+                                        <Run
+                                            x:Name="MaxFreqRun"
+                                            FontWeight="SemiBold"
+                                            Foreground="White"
+                                            Text="21,480 Hz" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <Border
+                                    x:Name="VerdictPill"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Background="{StaticResource BadgePassBackground}"
+                                    BorderBrush="{StaticResource BadgePassBorder}"
+                                    Style="{StaticResource VerdictBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon
+                                            x:Name="VerdictGlyph"
+                                            FontSize="12"
+                                            Foreground="{StaticResource BadgePassForeground}"
+                                            Glyph="&#xE73E;" />
+                                        <TextBlock
+                                            x:Name="VerdictText"
+                                            FontSize="12.5"
+                                            Foreground="{StaticResource BadgePassForeground}"
+                                            Text="Reaches 20 kHz+" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <controls:SpectrumView x:Name="Spectrum" Grid.Row="1" />
+
+                            <Grid Grid.Row="2" ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <RadioButton
+                                    x:Name="ModeLossless"
+                                    Checked="Mode_Checked"
+                                    Content="Lossless"
+                                    GroupName="HeroMode"
+                                    IsChecked="True"
+                                    Style="{StaticResource SegmentRadioButtonStyle}" />
+                                <RadioButton
+                                    x:Name="ModeMp3"
+                                    Grid.Column="1"
+                                    Checked="Mode_Checked"
+                                    Content="MP3 → WAV"
+                                    GroupName="HeroMode"
+                                    Style="{StaticResource SegmentRadioButtonStyle}" />
+                                <Button
+                                    Grid.Column="3"
+                                    Click="OpenAnalyzer_Click"
+                                    Style="{StaticResource EmberButtonStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Analyze" />
+                                        <FontIcon FontSize="12" Glyph="&#xE72A;" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Border>
+            </Grid>
+
+            <!--  Hub: choose a module  -->
+            <StackPanel
+                x:Name="Hub"
+                Grid.Row="1"
+                Margin="0,24,0,0"
+                HorizontalAlignment="Center"
+                Spacing="16">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    CharacterSpacing="200"
+                    FontFamily="{StaticResource MonoFontFamily}"
+                    FontSize="12"
+                    Foreground="{ThemeResource InkFaintBrush}"
+                    Text="CHOOSE A MODULE" />
+                <StackPanel
+                    x:Name="Tiles"
+                    Orientation="Horizontal"
+                    Spacing="22">
+                    <Button
+                        x:Name="TileAnalyzer"
+                        AutomationProperties.Name="Open Analyzer"
+                        Click="Tile_Click"
+                        Style="{StaticResource HubTileButtonStyle}"
+                        Tag="analyzer">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Border
+                                    Width="44"
+                                    Height="44"
+                                    HorizontalAlignment="Left"
+                                    Background="{StaticResource AppleRedBrush}"
+                                    CornerRadius="14">
+                                    <FontIcon
+                                        FontSize="20"
+                                        Foreground="White"
+                                        Glyph="&#xE9D9;" />
+                                </Border>
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    FontFamily="{StaticResource MonoFontFamily}"
+                                    FontSize="11"
+                                    Foreground="{ThemeResource InkFaintBrush}"
+                                    Text="Ctrl+1" />
+                            </Grid>
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0,16,0,0"
+                                FontFamily="{StaticResource InterSemiBoldFontFamily}"
+                                FontSize="19"
+                                Text="Analyzer" />
+                            <TextBlock
+                                Grid.Row="2"
+                                FontSize="13"
+                                Foreground="{ThemeResource InkMutedBrush}"
+                                Text="Audits every WAV and AIFF against the 20 kHz threshold."
+                                TextWrapping="Wrap" />
+                        </Grid>
+                    </Button>
+                    <Button
+                        x:Name="TileDownload"
+                        AutomationProperties.Name="Open Download and Trim"
+                        Click="Tile_Click"
+                        Style="{StaticResource HubTileButtonStyle}"
+                        Tag="download">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Border
+                                    Width="44"
+                                    Height="44"
+                                    HorizontalAlignment="Left"
+                                    Background="#FF1C2029"
+                                    CornerRadius="14">
+                                    <FontIcon
+                                        FontSize="20"
+                                        Foreground="White"
+                                        Glyph="&#xE896;" />
+                                </Border>
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    FontFamily="{StaticResource MonoFontFamily}"
+                                    FontSize="11"
+                                    Foreground="{ThemeResource InkFaintBrush}"
+                                    Text="Ctrl+2" />
+                            </Grid>
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0,16,0,0"
+                                FontFamily="{StaticResource InterSemiBoldFontFamily}"
+                                FontSize="19"
+                                Text="Download &amp; Trim" />
+                            <TextBlock
+                                Grid.Row="2"
+                                FontSize="13"
+                                Foreground="{ThemeResource InkMutedBrush}"
+                                Text="FFmpeg and yt-dlp: save a link, whole or cut by time codes."
+                                TextWrapping="Wrap" />
+                        </Grid>
+                    </Button>
+                    <Button
+                        x:Name="TileSnippets"
+                        AutomationProperties.Name="Open Snippets"
+                        Click="Tile_Click"
+                        Style="{StaticResource HubTileButtonStyle}"
+                        Tag="snippets">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Border
+                                    Width="44"
+                                    Height="44"
+                                    HorizontalAlignment="Left"
+                                    Background="#FF1C2029"
+                                    CornerRadius="14">
+                                    <FontIcon
+                                        FontSize="20"
+                                        Foreground="White"
+                                        Glyph="&#xE8D6;" />
+                                </Border>
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    FontFamily="{StaticResource MonoFontFamily}"
+                                    FontSize="11"
+                                    Foreground="{ThemeResource InkFaintBrush}"
+                                    Text="Ctrl+3" />
+                            </Grid>
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0,16,0,0"
+                                FontFamily="{StaticResource InterSemiBoldFontFamily}"
+                                FontSize="19"
+                                Text="Snippets" />
+                            <TextBlock
+                                Grid.Row="2"
+                                FontSize="13"
+                                Foreground="{ThemeResource InkMutedBrush}"
+                                Text="Batch MP3 previews for every track in your folders."
+                                TextWrapping="Wrap" />
+                        </Grid>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <!--  Signature bar  -->
+            <Grid
+                x:Name="Signature"
+                Grid.Row="3"
+                Height="44"
+                Margin="-56,0,-56,0"
+                BorderBrush="{ThemeResource LineBrush}"
+                BorderThickness="0,1,0,0">
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <Ellipse
+                        Width="6"
+                        Height="6"
+                        VerticalAlignment="Center"
+                        Fill="{StaticResource AppleRedBrush}" />
+                    <TextBlock
+                        CharacterSpacing="120"
+                        FontFamily="{StaticResource MonoFontFamily}"
+                        FontSize="11.5"
+                        Foreground="{ThemeResource InkMutedBrush}"
+                        Text="Dev: Eduardo Oliveira (DUHZZ)" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

@@ -3,13 +3,52 @@
     x:Class="KhzAnalyzer.Pages.HomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:KhzAnalyzer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:KhzAnalyzer.Models"
+    xmlns:utils="using:KhzAnalyzer.Utils"
     NavigationCacheMode="Required"
     mc:Ignorable="d">
 
-    <Grid Padding="28,20,28,20" RowSpacing="18">
+    <Page.Resources>
+        <MenuFlyout x:Key="RowMenu" MenuFlyoutPresenterStyle="{StaticResource SolidMenuFlyoutPresenterStyle}" Opening="RowMenu_Opening">
+            <MenuFlyoutItem Click="MenuPlay_Click" Text="Play">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE768;" />
+                </MenuFlyoutItem.Icon>
+                <MenuFlyoutItem.KeyboardAcceleratorTextOverride>Enter</MenuFlyoutItem.KeyboardAcceleratorTextOverride>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Click="MenuInfo_Click" Text="Track information">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE946;" />
+                </MenuFlyoutItem.Icon>
+                <MenuFlyoutItem.KeyboardAcceleratorTextOverride>Ctrl+I</MenuFlyoutItem.KeyboardAcceleratorTextOverride>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Click="MenuAnalysis_Click" Text="Show full analysis">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE9D9;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Click="MenuExplorer_Click" Text="Show in Explorer">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE838;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem
+                Click="MenuRemove_Click"
+                Foreground="{StaticResource BadgeFailForeground}"
+                Text="Remove from queue">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE711;" />
+                </MenuFlyoutItem.Icon>
+                <MenuFlyoutItem.KeyboardAcceleratorTextOverride>Del</MenuFlyoutItem.KeyboardAcceleratorTextOverride>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </Page.Resources>
+
+    <Grid Padding="32,14,32,22" RowSpacing="14">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -18,77 +57,106 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  Cabeçalho: título + seleção de pasta  -->
-        <StackPanel Grid.Row="0" Spacing="14">
-            <StackPanel Spacing="2">
-                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Analyzer" />
-                <TextBlock
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Style="{StaticResource BodyTextBlockStyle}"
-                    Text="Checks whether each track has real spectral content up to 20 kHz. Anything lower is flagged for checking." />
-            </StackPanel>
-
-            <Grid ColumnSpacing="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <TextBox
-                    x:Name="PastaTextBox"
-                    Grid.Column="0"
-                    PlaceholderText="Paste a folder path here, or use Browse…" />
-
-                <Button
-                    x:Name="ProcurarButton"
-                    Grid.Column="1"
-                    Click="ProcurarButton_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontSize="15" Glyph="&#xE838;" />
-                        <TextBlock Text="Browse" />
-                    </StackPanel>
-                </Button>
-
-                <Button
-                    x:Name="AnalisarButton"
-                    Grid.Column="2"
-                    Click="AnalisarButton_Click"
-                    Style="{StaticResource AccentButtonStyle}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontSize="15" Glyph="&#xE768;" />
-                        <TextBlock Text="Analyze" />
-                    </StackPanel>
-                </Button>
-
-                <Button
-                    x:Name="CancelarButton"
-                    Grid.Column="3"
-                    Click="CancelarButton_Click"
-                    IsEnabled="False">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontSize="15" Glyph="&#xE711;" />
-                        <TextBlock Text="Cancel" />
-                    </StackPanel>
-                </Button>
-
-                <Button
-                    x:Name="ExportarButton"
-                    Grid.Column="4"
-                    Click="ExportarButton_Click"
-                    IsEnabled="False">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontSize="15" Glyph="&#xE74E;" />
-                        <TextBlock Text="Export" />
-                    </StackPanel>
-                </Button>
-            </Grid>
+        <!--  Headline  -->
+        <StackPanel x:Name="Head" Spacing="2">
+            <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="ANALYZER" />
+            <TextBlock
+                FontFamily="{StaticResource DisplayFontFamily}"
+                FontSize="44"
+                LineHeight="50"
+                LineStackingStrategy="BlockLineHeight">
+                <Run Text="Does it reach " /><Run FontFamily="{StaticResource DisplayItalicFontFamily}" Text="20 kHz" /><Run Text="?" />
+            </TextBlock>
         </StackPanel>
 
-        <!--  Cartões de estatística  -->
-        <Grid Grid.Row="1" ColumnSpacing="12">
+        <!--  Folder + actions  -->
+        <Grid
+            x:Name="Actions"
+            Grid.Row="1"
+            ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+                <TextBox
+                    x:Name="PastaTextBox"
+                    MinHeight="44"
+                    Padding="40,12,12,10"
+                    VerticalContentAlignment="Center"
+                    AutomationProperties.Name="Folder"
+                    CornerRadius="12"
+                    PlaceholderText="Paste a folder path here, or use Browse…" />
+                <FontIcon
+                    Margin="15,0,0,0"
+                    HorizontalAlignment="Left"
+                    FontSize="15"
+                    Foreground="{ThemeResource InkFaintBrush}"
+                    Glyph="&#xE8B7;"
+                    IsHitTestVisible="False" />
+            </Grid>
+
+            <Button
+                x:Name="ProcurarButton"
+                Grid.Column="1"
+                Click="ProcurarButton_Click"
+                Style="{StaticResource GlassButtonStyle}"
+                ToolTipService.ToolTip="Choose a folder (Ctrl+O)">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontSize="14" Glyph="&#xE838;" />
+                    <TextBlock Text="Browse" />
+                </StackPanel>
+            </Button>
+
+            <Button
+                x:Name="AnalisarButton"
+                Grid.Column="2"
+                utils:Motion.Magnetic="True"
+                Click="AnalisarButton_Click"
+                Style="{StaticResource EmberButtonStyle}"
+                ToolTipService.ToolTip="Analyze (F5)">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontSize="14" Glyph="&#xE721;" />
+                    <TextBlock Text="Analyze" />
+                </StackPanel>
+            </Button>
+
+            <Button
+                x:Name="CancelarButton"
+                Grid.Column="3"
+                Click="CancelarButton_Click"
+                IsEnabled="False"
+                Style="{StaticResource GlassButtonStyle}"
+                ToolTipService.ToolTip="Cancel (Esc)">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontSize="13" Glyph="&#xE711;" />
+                    <TextBlock Text="Cancel" />
+                </StackPanel>
+            </Button>
+
+            <Button
+                x:Name="ExportarButton"
+                Grid.Column="4"
+                Click="ExportarButton_Click"
+                IsEnabled="False"
+                Style="{StaticResource GlassButtonStyle}"
+                ToolTipService.ToolTip="Export .docx and .csv (Ctrl+E)">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontSize="14" Glyph="&#xE896;" />
+                    <TextBlock Text="Export" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!--  Stat cards  -->
+        <Grid
+            x:Name="Stats"
+            Grid.Row="2"
+            ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -96,109 +164,94 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-
             <Border
-                Grid.Column="0"
-                Padding="18,14"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <StackPanel Spacing="2">
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="TOTAL" />
+                x:Name="CardTotal"
+                Padding="18,12"
+                utils:Motion.Tilt="4"
+                CornerRadius="18"
+                Style="{StaticResource GlassCardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="TOTAL" />
                     <TextBlock
                         x:Name="TotalText"
-                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Style="{StaticResource StatValueTextBlockStyle}"
                         Text="0" />
                 </StackPanel>
             </Border>
-
             <Border
+                x:Name="CardPass"
                 Grid.Column="1"
-                Padding="18,14"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <StackPanel Spacing="2">
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="PASSED" />
+                Padding="18,12"
+                utils:Motion.Tilt="4"
+                CornerRadius="18"
+                Style="{StaticResource GlassCardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="PASSED" />
                     <TextBlock
                         x:Name="OkText"
-                        Foreground="#2EA043"
-                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Foreground="{StaticResource BadgePassForeground}"
+                        Style="{StaticResource StatValueTextBlockStyle}"
                         Text="0" />
                 </StackPanel>
             </Border>
-
             <Border
+                x:Name="CardBelow"
                 Grid.Column="2"
-                Padding="18,14"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <StackPanel Spacing="2">
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="BELOW 20 kHz" />
+                Padding="18,12"
+                utils:Motion.Tilt="4"
+                CornerRadius="18"
+                Style="{StaticResource GlassCardStyle}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon
+                            FontSize="11"
+                            Foreground="{StaticResource BadgeFailForeground}"
+                            Glyph="&#xE7BA;" />
+                        <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="BELOW 20 KHZ" />
+                    </StackPanel>
                     <TextBlock
                         x:Name="AbaixoText"
-                        Foreground="#E04A3F"
-                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Foreground="{StaticResource BadgeFailForeground}"
+                        Style="{StaticResource StatValueTextBlockStyle}"
                         Text="0" />
                 </StackPanel>
             </Border>
-
             <Border
+                x:Name="CardErrors"
                 Grid.Column="3"
-                Padding="18,14"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <StackPanel Spacing="2">
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="ERRORS" />
+                Padding="18,12"
+                utils:Motion.Tilt="4"
+                CornerRadius="18"
+                Style="{StaticResource GlassCardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="ERRORS" />
                     <TextBlock
                         x:Name="ErroText"
-                        Foreground="#F59E0B"
-                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Foreground="{StaticResource BadgeWarnForeground}"
+                        Style="{StaticResource StatValueTextBlockStyle}"
                         Text="0" />
                 </StackPanel>
             </Border>
-
             <Border
+                x:Name="CardOffline"
                 Grid.Column="4"
-                Padding="18,14"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <StackPanel Spacing="2">
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="NOT DOWNLOADED" />
+                Padding="18,12"
+                utils:Motion.Tilt="4"
+                CornerRadius="18"
+                Style="{StaticResource GlassCardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="NOT DOWNLOADED" />
                     <TextBlock
                         x:Name="OfflineText"
-                        Foreground="#8B8B8B"
-                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Foreground="{StaticResource BadgeMutedForeground}"
+                        Style="{StaticResource StatValueTextBlockStyle}"
                         Text="0" />
                 </StackPanel>
             </Border>
         </Grid>
 
-        <!--  Progresso  -->
-        <StackPanel Grid.Row="2" Spacing="6">
+        <!--  Progress  -->
+        <StackPanel Grid.Row="3" Spacing="5">
             <ProgressBar
                 x:Name="Progresso"
                 Maximum="1"
@@ -206,186 +259,291 @@
                 Value="0" />
             <TextBlock
                 x:Name="StatusText"
-                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Style="{StaticResource CaptionTextBlockStyle}"
-                Text="Ready." />
+                FontSize="12"
+                Foreground="{ThemeResource InkFaintBrush}"
+                Text="Ready."
+                TextTrimming="CharacterEllipsis" />
         </StackPanel>
 
-        <!--  Filtros + busca  -->
-        <Grid Grid.Row="3" ColumnSpacing="12">
+        <!--  Table + Now Playing  -->
+        <Grid Grid.Row="4" ColumnSpacing="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="370" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel
-                Grid.Column="0"
-                Orientation="Horizontal"
-                Spacing="8">
-                <RadioButton
-                    x:Name="FiltroTodos"
-                    Checked="Filtro_Changed"
-                    Content="All"
-                    GroupName="Filtro"
-                    IsChecked="True"
-                    Style="{StaticResource DefaultRadioButtonStyle}" />
-                <RadioButton
-                    x:Name="FiltroOk"
-                    Checked="Filtro_Changed"
-                    Content="Passed"
-                    GroupName="Filtro" />
-                <RadioButton
-                    x:Name="FiltroProblemas"
-                    Checked="Filtro_Changed"
-                    Content="Issues"
-                    GroupName="Filtro" />
-            </StackPanel>
+            <Border
+                x:Name="TableCard"
+                Padding="0"
+                Style="{StaticResource GlassCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-            <AutoSuggestBox
-                x:Name="BuscaBox"
-                Grid.Column="1"
-                HorizontalAlignment="Stretch"
-                PlaceholderText="Search tracks…"
-                QueryIcon="Find"
-                TextChanged="BuscaBox_TextChanged" />
-        </Grid>
+                    <Grid Padding="14,12,14,8" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <RadioButton
+                            x:Name="FiltroTodos"
+                            Checked="Filtro_Changed"
+                            Content="All"
+                            GroupName="Filtro"
+                            IsChecked="True"
+                            Style="{StaticResource SegmentRadioButtonStyle}" />
+                        <RadioButton
+                            x:Name="FiltroOk"
+                            Grid.Column="1"
+                            Checked="Filtro_Changed"
+                            Content="Passed"
+                            GroupName="Filtro"
+                            Style="{StaticResource SegmentRadioButtonStyle}" />
+                        <RadioButton
+                            x:Name="FiltroProblemas"
+                            Grid.Column="2"
+                            Checked="Filtro_Changed"
+                            Content="Issues"
+                            GroupName="Filtro"
+                            Style="{StaticResource SegmentRadioButtonStyle}" />
+                        <AutoSuggestBox
+                            x:Name="BuscaBox"
+                            Grid.Column="3"
+                            MaxWidth="320"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            PlaceholderText="Search tracks…"
+                            QueryIcon="Find"
+                            TextChanged="BuscaBox_TextChanged" />
+                    </Grid>
 
-        <!--  Tabela de resultados  -->
-        <Border
-            Grid.Row="4"
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                    <Grid
+                        Grid.Row="1"
+                        Padding="14,8,14,8"
+                        BorderBrush="{ThemeResource LineBrush}"
+                        BorderThickness="0,1,0,1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="96" />
+                            <ColumnDefinition Width="172" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" Style="{StaticResource EyebrowTextBlockStyle}" Text="TRACK" />
+                        <TextBlock Grid.Column="2" Style="{StaticResource EyebrowTextBlockStyle}" Text="KEY" />
+                        <TextBlock Grid.Column="3" Style="{StaticResource EyebrowTextBlockStyle}" Text="BPM" />
+                        <TextBlock Grid.Column="4" Style="{StaticResource EyebrowTextBlockStyle}" Text="MAX FREQ." />
+                        <TextBlock Grid.Column="5" Style="{StaticResource EyebrowTextBlockStyle}" Text="VERDICT" />
+                    </Grid>
 
-                <!--  Cabeçalho da tabela  -->
-                <Grid
-                    Grid.Row="0"
-                    Padding="16,12"
-                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                    BorderThickness="0,0,0,1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="32" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="60" />
-                        <ColumnDefinition Width="60" />
-                        <ColumnDefinition Width="70" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="70" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="170" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Column="1"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="TRACK" />
-                    <TextBlock
-                        Grid.Column="2"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="KEY" />
-                    <TextBlock
-                        Grid.Column="3"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="BPM" />
-                    <TextBlock
-                        Grid.Column="4"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="FORMAT" />
-                    <TextBlock
-                        Grid.Column="5"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="SAMPLE RATE" />
-                    <TextBlock
-                        Grid.Column="6"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="BITS" />
-                    <TextBlock
-                        Grid.Column="7"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="MAX FREQ." />
-                    <TextBlock
-                        Grid.Column="8"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="VERDICT" />
+                    <ListView
+                        x:Name="ResultadosList"
+                        Grid.Row="2"
+                        Padding="0,4,0,8"
+                        DoubleTapped="ResultadosList_DoubleTapped"
+                        IsItemClickEnabled="False"
+                        SelectionChanged="ResultadosList_SelectionChanged"
+                        SelectionMode="Single">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="14,0" />
+                                <Setter Property="MinHeight" Value="42" />
+                                <Setter Property="Margin" Value="6,0" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:TrackRow">
+                                <Grid Background="Transparent" ContextFlyout="{StaticResource RowMenu}">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip Placement="Mouse">
+                                            <StackPanel MaxWidth="420" Spacing="6">
+                                                <TextBlock
+                                                    FontFamily="{StaticResource InterSemiBoldFontFamily}"
+                                                    FontSize="14"
+                                                    Text="{x:Bind Faixa}"
+                                                    TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    FontFamily="{StaticResource MonoFontFamily}"
+                                                    FontSize="11.5"
+                                                    Opacity="0.8"
+                                                    Text="{x:Bind ResumoTecnico}"
+                                                    TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="{x:Bind BadgeForeground}"
+                                                    Text="{x:Bind Veredito}" />
+                                                <TextBlock
+                                                    FontSize="11"
+                                                    Opacity="0.65"
+                                                    Text="{x:Bind CaminhoCompleto}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToolTipService.ToolTip>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="96" />
+                                        <ColumnDefinition Width="172" />
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon
+                                        HorizontalAlignment="Left"
+                                        FontSize="14"
+                                        Foreground="{x:Bind BadgeForeground}"
+                                        Glyph="{x:Bind StatusGlyph}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center"
+                                        Text="{x:Bind Faixa}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource MonoFontFamily}"
+                                        FontSize="12.5"
+                                        Foreground="{ThemeResource InkMutedBrush}"
+                                        Text="{x:Bind Key}" />
+                                    <TextBlock
+                                        Grid.Column="3"
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource MonoFontFamily}"
+                                        FontSize="12.5"
+                                        Foreground="{ThemeResource InkMutedBrush}"
+                                        Text="{x:Bind Bpm}" />
+                                    <TextBlock
+                                        Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource MonoFontFamily}"
+                                        FontSize="12.5"
+                                        Foreground="{ThemeResource InkMutedBrush}"
+                                        Text="{x:Bind FreqMax}" />
+                                    <Border
+                                        Grid.Column="5"
+                                        VerticalAlignment="Center"
+                                        Background="{x:Bind BadgeBackground}"
+                                        BorderBrush="{x:Bind BadgeBorder}"
+                                        Style="{StaticResource VerdictBadgeStyle}">
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{x:Bind BadgeForeground}"
+                                            Text="{x:Bind Veredito}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Grid>
+            </Border>
 
-                <ListView
-                    x:Name="ResultadosList"
-                    Grid.Row="1"
-                    IsItemClickEnabled="False"
-                    SelectionMode="Single">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Padding" Value="16,8" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:TrackRow">
-                            <Grid>
+            <!--  Right column  -->
+            <ScrollViewer
+                x:Name="RightColumn"
+                Grid.Column="1"
+                Margin="0,0,-12,0"
+                Padding="0,0,12,0"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel Padding="0,4,0,8" Spacing="12">
+                    <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="NOW PLAYING" />
+                    <controls:PlayerDeck x:Name="Deck" Margin="0,4,0,10" />
+
+                    <Border
+                        x:Name="InfoCard"
+                        Padding="20,16"
+                        Style="{StaticResource GlassCardStyle}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Style="{StaticResource EyebrowTextBlockStyle}" Text="TRACK INFORMATION" />
+                            <TextBlock
+                                x:Name="InfoEmpty"
+                                Foreground="{ThemeResource InkMutedBrush}"
+                                Text="Select a track to see its details."
+                                TextWrapping="Wrap" />
+                            <Grid
+                                x:Name="InfoGrid"
+                                ColumnSpacing="14"
+                                RowSpacing="7"
+                                Visibility="Collapsed">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="32" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="60" />
-                                    <ColumnDefinition Width="60" />
-                                    <ColumnDefinition Width="70" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="70" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="170" />
                                 </Grid.ColumnDefinitions>
-
-                                <FontIcon
-                                    Grid.Column="0"
-                                    HorizontalAlignment="Left"
-                                    FontSize="14"
-                                    Foreground="{x:Bind StatusBrush}"
-                                    Glyph="{x:Bind StatusGlyph}" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Foreground="{ThemeResource InkMutedBrush}" Text="Track" />
                                 <TextBlock
+                                    x:Name="InfoTrack"
                                     Grid.Column="1"
-                                    Margin="0,0,12,0"
-                                    Text="{x:Bind Faixa}"
-                                    TextTrimming="CharacterEllipsis"
-                                    ToolTipService.ToolTip="{x:Bind CaminhoCompleto}" />
+                                    FontFamily="{StaticResource InterSemiBoldFontFamily}"
+                                    TextWrapping="Wrap" />
                                 <TextBlock
-                                    Grid.Column="2"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind Key}" />
+                                    Grid.Row="1"
+                                    Foreground="{ThemeResource InkMutedBrush}"
+                                    Text="Max freq." />
                                 <TextBlock
-                                    Grid.Column="3"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind Bpm}" />
+                                    x:Name="InfoFreq"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    FontFamily="{StaticResource MonoFontFamily}" />
                                 <TextBlock
-                                    Grid.Column="4"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind Formato}" />
+                                    Grid.Row="2"
+                                    Foreground="{ThemeResource InkMutedBrush}"
+                                    Text="Sample rate" />
                                 <TextBlock
-                                    Grid.Column="5"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind SampleRate}" />
+                                    x:Name="InfoRate"
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    FontFamily="{StaticResource MonoFontFamily}" />
                                 <TextBlock
-                                    Grid.Column="6"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind Bits}" />
+                                    Grid.Row="3"
+                                    Foreground="{ThemeResource InkMutedBrush}"
+                                    Text="Bit depth" />
                                 <TextBlock
-                                    Grid.Column="7"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind FreqMax}" />
+                                    x:Name="InfoBits"
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    FontFamily="{StaticResource MonoFontFamily}" />
                                 <TextBlock
-                                    Grid.Column="8"
-                                    Foreground="{x:Bind StatusBrush}"
-                                    Text="{x:Bind Veredito}"
-                                    TextTrimming="CharacterEllipsis" />
+                                    Grid.Row="4"
+                                    Foreground="{ThemeResource InkMutedBrush}"
+                                    Text="Format" />
+                                <TextBlock
+                                    x:Name="InfoFormat"
+                                    Grid.Row="4"
+                                    Grid.Column="1"
+                                    FontFamily="{StaticResource MonoFontFamily}" />
+                                <TextBlock
+                                    Grid.Row="5"
+                                    VerticalAlignment="Center"
+                                    Foreground="{ThemeResource InkMutedBrush}"
+                                    Text="Verdict" />
+                                <Border
+                                    x:Name="InfoBadge"
+                                    Grid.Row="5"
+                                    Grid.Column="1"
+                                    Style="{StaticResource VerdictBadgeStyle}">
+                                    <TextBlock x:Name="InfoVerdict" FontSize="12" />
+                                </Border>
                             </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-        </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Page>

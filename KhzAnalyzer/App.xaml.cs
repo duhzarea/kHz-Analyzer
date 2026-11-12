@@ -65,7 +65,7 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         var uiSettings = new Windows.UI.ViewManagement.UISettings();
-        if (!uiSettings.AnimationsEnabled)
+        if (!Utils.Motion.Enabled)
         {
             var zeroTime = Microsoft.UI.Xaml.Media.Animation.KeyTime.FromTimeSpan(System.TimeSpan.Zero);
             this.Resources["DurationFastKeyTime"] = zeroTime;

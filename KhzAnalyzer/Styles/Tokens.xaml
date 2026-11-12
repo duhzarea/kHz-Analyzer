@@ -1,82 +1,386 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
+    <!-- kHz Analyzer design tokens. Generated from the design system's tokens.json:
+         colour token "ink-muted" becomes InkMutedBrush / InkMutedColor. Brand switched to Apple Music red (#FA243C) on 2026-11-12. -->
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
-            <SolidColorBrush x:Key="AppFallbackBackgroundBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="SurfaceCardBrush" Color="#08000000" />
-            <SolidColorBrush x:Key="SurfaceCardHoverBrush" Color="#0C000000" />
-            <SolidColorBrush x:Key="BrandAccentBrush" Color="#c2410c" />
-            <SolidColorBrush x:Key="BrandAccentHoverBrush" Color="#9a3412" />
-            <SolidColorBrush x:Key="SuccessBrush" Color="#166534" />
-            <SolidColorBrush x:Key="DangerBrush" Color="#b91c1c" />
-            <SolidColorBrush x:Key="NeutralErrorBrush" Color="#475569" />
-            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E4000000" />
-            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#99000000" />
-            <SolidColorBrush x:Key="TextInverseBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="BorderSubtleBrush" Color="#10000000" />
+            <SolidColorBrush x:Key="GroundBrush" Color="#FFF5F6F8" />
+            <Color x:Key="GroundColor">#FFF5F6F8</Color>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
+            <Color x:Key="SurfaceColor">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="SurfaceSunkenBrush" Color="#FFECEEF2" />
+            <Color x:Key="SurfaceSunkenColor">#FFECEEF2</Color>
+            <SolidColorBrush x:Key="GlassBrush" Color="#9EFFFFFF" />
+            <Color x:Key="GlassColor">#9EFFFFFF</Color>
+            <SolidColorBrush x:Key="GlassLowBrush" Color="#66FFFFFF" />
+            <Color x:Key="GlassLowColor">#66FFFFFF</Color>
+            <SolidColorBrush x:Key="LineBrush" Color="#1A0F172A" />
+            <Color x:Key="LineColor">#1A0F172A</Color>
+            <SolidColorBrush x:Key="LineStrongBrush" Color="#2E0F172A" />
+            <Color x:Key="LineStrongColor">#2E0F172A</Color>
+            <SolidColorBrush x:Key="InkBrush" Color="#FF0F1115" />
+            <Color x:Key="InkColor">#FF0F1115</Color>
+            <SolidColorBrush x:Key="InkMutedBrush" Color="#FF4B5260" />
+            <Color x:Key="InkMutedColor">#FF4B5260</Color>
+            <SolidColorBrush x:Key="InkFaintBrush" Color="#FF5F6673" />
+            <Color x:Key="InkFaintColor">#FF5F6673</Color>
+            <SolidColorBrush x:Key="BrandBrush" Color="#FFFA243C" />
+            <Color x:Key="BrandColor">#FFFA243C</Color>
+            <SolidColorBrush x:Key="BrandHoverBrush" Color="#FFD3122B" />
+            <Color x:Key="BrandHoverColor">#FFD3122B</Color>
+            <SolidColorBrush x:Key="BrandFillBrush" Color="#FFFA243C" />
+            <Color x:Key="BrandFillColor">#FFFA243C</Color>
+            <SolidColorBrush x:Key="BrandFillActiveBrush" Color="#FFD3122B" />
+            <Color x:Key="BrandFillActiveColor">#FFD3122B</Color>
+            <SolidColorBrush x:Key="OnBrandBrush" Color="#FFFFFFFF" />
+            <Color x:Key="OnBrandColor">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="BrandGlowBrush" Color="#FFFF375F" />
+            <Color x:Key="BrandGlowColor">#FFFF375F</Color>
+            <SolidColorBrush x:Key="AmberGlowBrush" Color="#FFFF8A9B" />
+            <Color x:Key="AmberGlowColor">#FFFF8A9B</Color>
+            <SolidColorBrush x:Key="SpecCyanBrush" Color="#FF0E7490" />
+            <Color x:Key="SpecCyanColor">#FF0E7490</Color>
+            <SolidColorBrush x:Key="SpecGreenBrush" Color="#FF15803D" />
+            <Color x:Key="SpecGreenColor">#FF15803D</Color>
+            <SolidColorBrush x:Key="SpecYellowBrush" Color="#FFA16207" />
+            <Color x:Key="SpecYellowColor">#FFA16207</Color>
+            <SolidColorBrush x:Key="SpecOrangeBrush" Color="#FFC2410C" />
+            <Color x:Key="SpecOrangeColor">#FFC2410C</Color>
+            <SolidColorBrush x:Key="SpecRedBrush" Color="#FFB91C1C" />
+            <Color x:Key="SpecRedColor">#FFB91C1C</Color>
+            <SolidColorBrush x:Key="PassBrush" Color="#FF166534" />
+            <Color x:Key="PassColor">#FF166534</Color>
+            <SolidColorBrush x:Key="FailBrush" Color="#FFB91C1C" />
+            <Color x:Key="FailColor">#FFB91C1C</Color>
+            <SolidColorBrush x:Key="WarnBrush" Color="#FFB45309" />
+            <Color x:Key="WarnColor">#FFB45309</Color>
+            <SolidColorBrush x:Key="OfflineBrush" Color="#FF5B6577" />
+            <Color x:Key="OfflineColor">#FF5B6577</Color>
+            <SolidColorBrush x:Key="PassSoftBrush" Color="#1A166534" />
+            <Color x:Key="PassSoftColor">#1A166534</Color>
+            <SolidColorBrush x:Key="FailSoftBrush" Color="#1AB91C1C" />
+            <Color x:Key="FailSoftColor">#1AB91C1C</Color>
+            <SolidColorBrush x:Key="WarnSoftBrush" Color="#1AB45309" />
+            <Color x:Key="WarnSoftColor">#1AB45309</Color>
+            <SolidColorBrush x:Key="FocusBrush" Color="#FFFA243C" />
+            <Color x:Key="FocusColor">#FFFA243C</Color>
+            <SolidColorBrush x:Key="NavyBrush" Color="#FF0F172A" />
+            <Color x:Key="NavyColor">#FF0F172A</Color>
+            <SolidColorBrush x:Key="ScrimBrush" Color="#590F1115" />
+            <Color x:Key="ScrimColor">#590F1115</Color>
+            <SolidColorBrush x:Key="AppFallbackBackgroundBrush" Color="#FFF5F6F8" />
+            <SolidColorBrush x:Key="SurfaceCardBrush" Color="#66FFFFFF" />
+            <SolidColorBrush x:Key="SurfaceCardHoverBrush" Color="#9EFFFFFF" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="BrandAccentHoverBrush" Color="#FFD3122B" />
+            <SolidColorBrush x:Key="SuccessBrush" Color="#FF166534" />
+            <SolidColorBrush x:Key="DangerBrush" Color="#FFB91C1C" />
+            <SolidColorBrush x:Key="NeutralErrorBrush" Color="#FF5B6577" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FF0F1115" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FF4B5260" />
+            <SolidColorBrush x:Key="TextInverseBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="BorderSubtleBrush" Color="#1A0F172A" />
+            <LinearGradientBrush x:Key="SpectrumBrush" StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF0E7490" Offset="0.00" /><GradientStop Color="#FF15803D" Offset="0.25" /><GradientStop Color="#FFA16207" Offset="0.50" /><GradientStop Color="#FFFA243C" Offset="0.75" /><GradientStop Color="#FFB91C1C" Offset="1.00" /></LinearGradientBrush>
+            <LinearGradientBrush x:Key="GlassGradientBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#9EFFFFFF" Offset="0" /><GradientStop Color="#66FFFFFF" Offset="1" /></LinearGradientBrush>
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#00000000" />
+            <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FFECEEF2" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FFECEEF2" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#1A0F172A" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#2E0F172A" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="#FF0F1115" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#FF0F1115" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#FF5F6673" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#FF5F6673" />
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="ProgressBarForeground" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedFill" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#FFFA243C" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#FFFA243C" />
+            <!-- Pop-ups: near-solid so the table behind never bleeds through -->
+            <SolidColorBrush x:Key="PopupSurfaceBrush" Color="#FAFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipBackground" Color="#FCFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="#FF0F1115" />
+            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#2E0F172A" />
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FAFFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#2E0F172A" />
+            <SolidColorBrush x:Key="ScrubTrackBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="SidebarBrush" Color="#B8FFFFFF" />
+            <SolidColorBrush x:Key="KeyCapBrush" Color="#FFFFFFFF" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="AppFallbackBackgroundBrush" Color="#050505" />
-            <SolidColorBrush x:Key="SurfaceCardBrush" Color="#0DFFFFFF" />
-            <SolidColorBrush x:Key="SurfaceCardHoverBrush" Color="#14FFFFFF" />
-            <SolidColorBrush x:Key="BrandAccentBrush" Color="#f97316" />
-            <SolidColorBrush x:Key="BrandAccentHoverBrush" Color="#fdba74" />
-            <SolidColorBrush x:Key="SuccessBrush" Color="#2ea043" />
-            <SolidColorBrush x:Key="DangerBrush" Color="#ef4444" />
-            <SolidColorBrush x:Key="NeutralErrorBrush" Color="#94a3b8" />
-            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#99FFFFFF" />
-            <SolidColorBrush x:Key="TextInverseBrush" Color="#E4000000" />
-            <SolidColorBrush x:Key="BorderSubtleBrush" Color="#1AFFFFFF" />
+            <SolidColorBrush x:Key="GroundBrush" Color="#FF050505" />
+            <Color x:Key="GroundColor">#FF050505</Color>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#FF0C0F16" />
+            <Color x:Key="SurfaceColor">#FF0C0F16</Color>
+            <SolidColorBrush x:Key="SurfaceSunkenBrush" Color="#FF0A0D13" />
+            <Color x:Key="SurfaceSunkenColor">#FF0A0D13</Color>
+            <SolidColorBrush x:Key="GlassBrush" Color="#A6111827" />
+            <Color x:Key="GlassColor">#A6111827</Color>
+            <SolidColorBrush x:Key="GlassLowBrush" Color="#800D111C" />
+            <Color x:Key="GlassLowColor">#800D111C</Color>
+            <SolidColorBrush x:Key="LineBrush" Color="#14FFFFFF" />
+            <Color x:Key="LineColor">#14FFFFFF</Color>
+            <SolidColorBrush x:Key="LineStrongBrush" Color="#29FFFFFF" />
+            <Color x:Key="LineStrongColor">#29FFFFFF</Color>
+            <SolidColorBrush x:Key="InkBrush" Color="#FFFFFFFF" />
+            <Color x:Key="InkColor">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="InkMutedBrush" Color="#FFA3A3A3" />
+            <Color x:Key="InkMutedColor">#FFA3A3A3</Color>
+            <SolidColorBrush x:Key="InkFaintBrush" Color="#FF8F8F8F" />
+            <Color x:Key="InkFaintColor">#FF8F8F8F</Color>
+            <SolidColorBrush x:Key="BrandBrush" Color="#FFFF3B52" />
+            <Color x:Key="BrandColor">#FFFF3B52</Color>
+            <SolidColorBrush x:Key="BrandHoverBrush" Color="#FFFF7A8C" />
+            <Color x:Key="BrandHoverColor">#FFFF7A8C</Color>
+            <SolidColorBrush x:Key="BrandFillBrush" Color="#FFFA243C" />
+            <Color x:Key="BrandFillColor">#FFFA243C</Color>
+            <SolidColorBrush x:Key="BrandFillActiveBrush" Color="#FFD3122B" />
+            <Color x:Key="BrandFillActiveColor">#FFD3122B</Color>
+            <SolidColorBrush x:Key="OnBrandBrush" Color="#FFFFFFFF" />
+            <Color x:Key="OnBrandColor">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="BrandGlowBrush" Color="#FFFF375F" />
+            <Color x:Key="BrandGlowColor">#FFFF375F</Color>
+            <SolidColorBrush x:Key="AmberGlowBrush" Color="#FFFF8A9B" />
+            <Color x:Key="AmberGlowColor">#FFFF8A9B</Color>
+            <SolidColorBrush x:Key="SpecCyanBrush" Color="#FF22D3EE" />
+            <Color x:Key="SpecCyanColor">#FF22D3EE</Color>
+            <SolidColorBrush x:Key="SpecGreenBrush" Color="#FF4ADE80" />
+            <Color x:Key="SpecGreenColor">#FF4ADE80</Color>
+            <SolidColorBrush x:Key="SpecYellowBrush" Color="#FFFACC15" />
+            <Color x:Key="SpecYellowColor">#FFFACC15</Color>
+            <SolidColorBrush x:Key="SpecOrangeBrush" Color="#FFFB923C" />
+            <Color x:Key="SpecOrangeColor">#FFFB923C</Color>
+            <SolidColorBrush x:Key="SpecRedBrush" Color="#FFEF4444" />
+            <Color x:Key="SpecRedColor">#FFEF4444</Color>
+            <SolidColorBrush x:Key="PassBrush" Color="#FF2EA043" />
+            <Color x:Key="PassColor">#FF2EA043</Color>
+            <SolidColorBrush x:Key="FailBrush" Color="#FFEF4444" />
+            <Color x:Key="FailColor">#FFEF4444</Color>
+            <SolidColorBrush x:Key="WarnBrush" Color="#FFF59E0B" />
+            <Color x:Key="WarnColor">#FFF59E0B</Color>
+            <SolidColorBrush x:Key="OfflineBrush" Color="#FF94A3B8" />
+            <Color x:Key="OfflineColor">#FF94A3B8</Color>
+            <SolidColorBrush x:Key="PassSoftBrush" Color="#292EA043" />
+            <Color x:Key="PassSoftColor">#292EA043</Color>
+            <SolidColorBrush x:Key="FailSoftBrush" Color="#29EF4444" />
+            <Color x:Key="FailSoftColor">#29EF4444</Color>
+            <SolidColorBrush x:Key="WarnSoftBrush" Color="#29F59E0B" />
+            <Color x:Key="WarnSoftColor">#29F59E0B</Color>
+            <SolidColorBrush x:Key="FocusBrush" Color="#FFFF7A8C" />
+            <Color x:Key="FocusColor">#FFFF7A8C</Color>
+            <SolidColorBrush x:Key="NavyBrush" Color="#FF0F172A" />
+            <Color x:Key="NavyColor">#FF0F172A</Color>
+            <SolidColorBrush x:Key="ScrimBrush" Color="#8C000000" />
+            <Color x:Key="ScrimColor">#8C000000</Color>
+            <SolidColorBrush x:Key="AppFallbackBackgroundBrush" Color="#FF050505" />
+            <SolidColorBrush x:Key="SurfaceCardBrush" Color="#800D111C" />
+            <SolidColorBrush x:Key="SurfaceCardHoverBrush" Color="#A6111827" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="BrandAccentHoverBrush" Color="#FFFF7A8C" />
+            <SolidColorBrush x:Key="SuccessBrush" Color="#FF2EA043" />
+            <SolidColorBrush x:Key="DangerBrush" Color="#FFEF4444" />
+            <SolidColorBrush x:Key="NeutralErrorBrush" Color="#FF94A3B8" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FFA3A3A3" />
+            <SolidColorBrush x:Key="TextInverseBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="BorderSubtleBrush" Color="#14FFFFFF" />
+            <LinearGradientBrush x:Key="SpectrumBrush" StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF22D3EE" Offset="0.00" /><GradientStop Color="#FF4ADE80" Offset="0.25" /><GradientStop Color="#FFFACC15" Offset="0.50" /><GradientStop Color="#FFFB923C" Offset="0.75" /><GradientStop Color="#FFEF4444" Offset="1.00" /></LinearGradientBrush>
+            <LinearGradientBrush x:Key="GlassGradientBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#A6111827" Offset="0" /><GradientStop Color="#800D111C" Offset="1" /></LinearGradientBrush>
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#00000000" />
+            <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FF0A0D13" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FF0A0D13" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF0C0F16" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#14FFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#29FFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#FF8F8F8F" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#FF8F8F8F" />
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="ProgressBarForeground" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedFill" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#FFFF3B52" />
+            <SolidColorBrush x:Key="PopupSurfaceBrush" Color="#F7181B22" />
+            <SolidColorBrush x:Key="ToolTipBackground" Color="#FC1C1F27" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#F7181B22" />
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="ScrubTrackBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="SidebarBrush" Color="#8C0C0F16" />
+            <SolidColorBrush x:Key="KeyCapBrush" Color="#FF1C2029" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
+            <SolidColorBrush x:Key="GroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <Color x:Key="GroundColor">#FF050505</Color>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <Color x:Key="SurfaceColor">#FF0C0F16</Color>
+            <SolidColorBrush x:Key="SurfaceSunkenBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <Color x:Key="SurfaceSunkenColor">#FF0A0D13</Color>
+            <SolidColorBrush x:Key="GlassBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <Color x:Key="GlassColor">#A6111827</Color>
+            <SolidColorBrush x:Key="GlassLowBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <Color x:Key="GlassLowColor">#800D111C</Color>
+            <SolidColorBrush x:Key="LineBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="LineColor">#14FFFFFF</Color>
+            <SolidColorBrush x:Key="LineStrongBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="LineStrongColor">#29FFFFFF</Color>
+            <SolidColorBrush x:Key="InkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="InkColor">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="InkMutedBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="InkMutedColor">#FFA3A3A3</Color>
+            <SolidColorBrush x:Key="InkFaintBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <Color x:Key="InkFaintColor">#FF8F8F8F</Color>
+            <SolidColorBrush x:Key="BrandBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <Color x:Key="BrandColor">#FFFF3B52</Color>
+            <SolidColorBrush x:Key="BrandHoverBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <Color x:Key="BrandHoverColor">#FFFF7A8C</Color>
+            <SolidColorBrush x:Key="BrandFillBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <Color x:Key="BrandFillColor">#FFFA243C</Color>
+            <SolidColorBrush x:Key="BrandFillActiveBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <Color x:Key="BrandFillActiveColor">#FFD3122B</Color>
+            <SolidColorBrush x:Key="OnBrandBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+            <Color x:Key="OnBrandColor">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="BrandGlowBrush" Color="#FFFF375F" />
+            <Color x:Key="BrandGlowColor">#FFFF375F</Color>
+            <SolidColorBrush x:Key="AmberGlowBrush" Color="#FFFF8A9B" />
+            <Color x:Key="AmberGlowColor">#FFFF8A9B</Color>
+            <SolidColorBrush x:Key="SpecCyanBrush" Color="#FF22D3EE" />
+            <Color x:Key="SpecCyanColor">#FF22D3EE</Color>
+            <SolidColorBrush x:Key="SpecGreenBrush" Color="#FF4ADE80" />
+            <Color x:Key="SpecGreenColor">#FF4ADE80</Color>
+            <SolidColorBrush x:Key="SpecYellowBrush" Color="#FFFACC15" />
+            <Color x:Key="SpecYellowColor">#FFFACC15</Color>
+            <SolidColorBrush x:Key="SpecOrangeBrush" Color="#FFFB923C" />
+            <Color x:Key="SpecOrangeColor">#FFFB923C</Color>
+            <SolidColorBrush x:Key="SpecRedBrush" Color="#FFEF4444" />
+            <Color x:Key="SpecRedColor">#FFEF4444</Color>
+            <SolidColorBrush x:Key="PassBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="PassColor">#FF2EA043</Color>
+            <SolidColorBrush x:Key="FailBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="FailColor">#FFEF4444</Color>
+            <SolidColorBrush x:Key="WarnBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="WarnColor">#FFF59E0B</Color>
+            <SolidColorBrush x:Key="OfflineBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <Color x:Key="OfflineColor">#FF94A3B8</Color>
+            <SolidColorBrush x:Key="PassSoftBrush" Color="#292EA043" />
+            <Color x:Key="PassSoftColor">#292EA043</Color>
+            <SolidColorBrush x:Key="FailSoftBrush" Color="#29EF4444" />
+            <Color x:Key="FailSoftColor">#29EF4444</Color>
+            <SolidColorBrush x:Key="WarnSoftBrush" Color="#29F59E0B" />
+            <Color x:Key="WarnSoftColor">#29F59E0B</Color>
+            <SolidColorBrush x:Key="FocusBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <Color x:Key="FocusColor">#FFFF7A8C</Color>
+            <SolidColorBrush x:Key="NavyBrush" Color="#FF0F172A" />
+            <Color x:Key="NavyColor">#FF0F172A</Color>
+            <SolidColorBrush x:Key="ScrimBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <Color x:Key="ScrimColor">#8C000000</Color>
             <SolidColorBrush x:Key="AppFallbackBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="SurfaceCardBrush" Color="{ThemeResource SystemColorWindowColor}" />
-            <SolidColorBrush x:Key="SurfaceCardHoverBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="SurfaceCardHoverBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="BrandAccentBrush" Color="{ThemeResource SystemColorHighlightColor}" />
             <SolidColorBrush x:Key="BrandAccentHoverBrush" Color="{ThemeResource SystemColorHighlightColor}" />
             <SolidColorBrush x:Key="SuccessBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
-            <SolidColorBrush x:Key="DangerBrush" Color="{ThemeResource SystemColorHighlightColor}" />
-            <SolidColorBrush x:Key="NeutralErrorBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <SolidColorBrush x:Key="DangerBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="NeutralErrorBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="TextPrimaryBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="TextSecondaryBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="TextInverseBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
             <SolidColorBrush x:Key="BorderSubtleBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="SpectrumBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="GlassGradientBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="PopupSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="ScrubTrackBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="SidebarBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="KeyCapBrush" Color="{ThemeResource SystemColorWindowColor}" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
-    <!-- Tipografia (FontFamilies) -->
-    <FontFamily x:Key="InterMediumFontFamily">ms-appx:///Assets/Fonts/Inter-Medium.ttf#Inter Medium</FontFamily>
-    <FontFamily x:Key="InterSemiBoldFontFamily">ms-appx:///Assets/Fonts/Inter-SemiBold.ttf#Inter SemiBold</FontFamily>
-    <FontFamily x:Key="SystemIconsFontFamily">Segoe MDL2 Assets</FontFamily>
+    <!-- Windows accent ramp, so every built-in control (AccentButtonStyle, ToggleSwitch, focus, selection) is red too -->
+    <Color x:Key="SystemAccentColor">#FFFA243C</Color>
+    <Color x:Key="SystemAccentColorLight1">#FFFB4B5F</Color>
+    <Color x:Key="SystemAccentColorLight2">#FFFC6F80</Color>
+    <Color x:Key="SystemAccentColorLight3">#FFFD95A2</Color>
+    <Color x:Key="SystemAccentColorDark1">#FFE01A32</Color>
+    <Color x:Key="SystemAccentColorDark2">#FFC21029</Color>
+    <Color x:Key="SystemAccentColorDark3">#FF9C0C20</Color>
 
+    <!-- Verdict badges: mid tones that read on light and dark glass alike -->
+    <SolidColorBrush x:Key="BadgePassBackground" Color="#1F22A04B" />
+    <SolidColorBrush x:Key="BadgePassBorder" Color="#6622A04B" />
+    <SolidColorBrush x:Key="BadgePassForeground" Color="#FF1F9E4A" />
+    <SolidColorBrush x:Key="BadgeFailBackground" Color="#1FF0384E" />
+    <SolidColorBrush x:Key="BadgeFailBorder" Color="#66F0384E" />
+    <SolidColorBrush x:Key="BadgeFailForeground" Color="#FFF0384E" />
+    <SolidColorBrush x:Key="BadgeWarnBackground" Color="#1FE8900C" />
+    <SolidColorBrush x:Key="BadgeWarnBorder" Color="#66E8900C" />
+    <SolidColorBrush x:Key="BadgeWarnForeground" Color="#FFE08A0B" />
+    <SolidColorBrush x:Key="BadgeMutedBackground" Color="#1F94A3B8" />
+    <SolidColorBrush x:Key="BadgeMutedBorder" Color="#6694A3B8" />
+    <SolidColorBrush x:Key="BadgeMutedForeground" Color="#FF8592A6" />
+    <SolidColorBrush x:Key="AppleRedBrush" Color="#FFFA243C" />
+
+    <!-- Radii (radius-*), spacing (space-*), durations and curves: same values as the design system -->
+    <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">12</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">20</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">28</CornerRadius>
+    <CornerRadius x:Key="RadiusPill">22</CornerRadius>
     <CornerRadius x:Key="ButtonCornerRadius">22</CornerRadius>
     <CornerRadius x:Key="BadgeCornerRadius">12</CornerRadius>
-    <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
     <CornerRadius x:Key="InputCornerRadius">6</CornerRadius>
-
+    <x:Double x:Key="Space1">4</x:Double>
+    <x:Double x:Key="Space2">8</x:Double>
+    <x:Double x:Key="Space3">12</x:Double>
+    <x:Double x:Key="Space4">16</x:Double>
+    <x:Double x:Key="Space6">24</x:Double>
+    <x:Double x:Key="Space8">32</x:Double>
+    <x:Double x:Key="Space12">48</x:Double>
+    <x:Double x:Key="Space16">64</x:Double>
     <Thickness x:Key="SpacingSmall">8</Thickness>
     <Thickness x:Key="SpacingMedium">16</Thickness>
     <Thickness x:Key="SpacingLarge">24</Thickness>
     <Thickness x:Key="SpacingXLarge">32</Thickness>
-    
     <Thickness x:Key="ControlPaddingStandard">24,0</Thickness>
-    <Thickness x:Key="StatusBadgePadding">8,0</Thickness>
-    <Thickness x:Key="ToolTipPadding">8</Thickness>
+    <Thickness x:Key="StatusBadgePadding">10,0</Thickness>
+    <Thickness x:Key="ToolTipPadding">10,8</Thickness>
     <Thickness x:Key="InputTextMargin">16,0,16,0</Thickness>
     <Thickness x:Key="ControlBorderThickness">1</Thickness>
     <Thickness x:Key="NoBorderThickness">0</Thickness>
-    
     <x:Double x:Key="ControlHeightStandard">44</x:Double>
     <x:Double x:Key="ControlHeightBadge">24</x:Double>
     <x:Double x:Key="FontSizeStandard">14</x:Double>
     <x:Double x:Key="ToolTipFontSize">12</x:Double>
-
+    <x:Double x:Key="OpacityDisabled">0.4</x:Double>
     <KeyTime x:Key="DurationFastKeyTime">0:0:0.150</KeyTime>
     <KeyTime x:Key="DurationNormalKeyTime">0:0:0.300</KeyTime>
     <KeyTime x:Key="DurationSlowKeyTime">0:0:0.800</KeyTime>
+    <KeyTime x:Key="DurationRevealKeyTime">0:0:1.200</KeyTime>
+    <KeyTime x:Key="DurationThemeKeyTime">0:0:0.650</KeyTime>
     <KeySpline x:Key="SpringEasing">0.2,0.8,0.2,1</KeySpline>
-
+    <KeySpline x:Key="ExpoOutEasing">0.16,1,0.3,1</KeySpline>
+    <KeySpline x:Key="OvershootEasing">0.34,1,0.64,1</KeySpline>
+    <KeySpline x:Key="InOutSharpEasing">0.86,0,0.07,1</KeySpline>
 </ResourceDictionary>

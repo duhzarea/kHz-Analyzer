@@ -13,6 +13,9 @@ public sealed class AppSettings
 {
     public string Theme { get; set; } = "Light";
 
+    /// <summary>"On" (default), "System" (follow Windows Animation effects) or "Off".</summary>
+    public string Motion { get; set; } = "On";
+
     /// <summary>Download &amp; Trim: last folder used, and last format (index in the format list).</summary>
     public string DownloadFolder { get; set; } = "";
     public int DownloadFormat { get; set; }

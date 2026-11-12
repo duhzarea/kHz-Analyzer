@@ -23,6 +23,13 @@ public sealed class TrackRow
     public string Detalhe { get; init; } = "";
     public string StatusGlyph { get; init; } = "";
     public SolidColorBrush StatusBrush { get; init; } = new(Colors.Gray);
+    public Brush BadgeBackground { get; init; } = new SolidColorBrush(Colors.Transparent);
+    public Brush BadgeBorder { get; init; } = new SolidColorBrush(Colors.Transparent);
+    public Brush BadgeForeground { get; init; } = new SolidColorBrush(Colors.Gray);
+    /// <summary>One line for the row tooltip: format, sample rate, bit depth, max frequency.</summary>
+    public string ResumoTecnico { get; init; } = "";
+    public int SampleRateHz { get; init; }
+    public int BitsValue { get; init; }
     public StatusFaixa Status { get; init; }
     public VerdictKind Kind { get; init; }
 
@@ -62,8 +69,26 @@ public sealed class TrackRow
             _ => string.Create(Inv, $"Content measured up to {r.FreqMaximaDetectada:N0} Hz"),
         };
 
+        string badge = kind switch
+        {
+            VerdictKind.Pass => "Pass",
+            VerdictKind.Check => "Fail",
+            VerdictKind.Mp3Range or VerdictKind.Unreadable => "Warn",
+            _ => "Muted",
+        };
+        Brush Res(string k) => (Brush)Microsoft.UI.Xaml.Application.Current.Resources[$"Badge{badge}{k}"];
+        string resumo = measured
+            ? string.Create(Inv, $"{formato} · {r.SampleRate:N0} Hz · {r.Bits} bit · max {r.FreqMaximaDetectada:N0} Hz")
+            : $"{formato} · {detalhe}";
+
         return new TrackRow
         {
+            BadgeBackground = Res("Background"),
+            BadgeBorder = Res("Border"),
+            BadgeForeground = Res("Foreground"),
+            ResumoTecnico = resumo,
+            SampleRateHz = measured ? r.SampleRate : 0,
+            BitsValue = measured ? r.Bits : 0,
             CaminhoCompleto = r.Arquivo,
             Faixa = faixa,
             Key = string.IsNullOrEmpty(key) ? "—" : key,

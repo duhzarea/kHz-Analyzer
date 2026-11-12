@@ -1,237 +1,223 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- kHz Analyzer controls. Names follow the design system:
+         EmberButtonStyle = button-custom (lumina), GlassButtonStyle = btn-glass + btn-glow,
+         DomeButtonStyle / PlayDomeButtonStyle = dome / dome lg, SegmentRadioButtonStyle = filter chips. -->
 
-    <Style x:Key="PrimaryPillButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{ThemeResource BrandAccentBrush}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextInverseBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource InterMediumFontFamily}" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeStandard}" />
-        <Setter Property="Height" Value="{StaticResource ControlHeightStandard}" />
-        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
-        <Setter Property="Padding" Value="{StaticResource ControlPaddingStandard}" />
-        <Setter Property="BorderThickness" Value="{StaticResource NoBorderThickness}" />
+    <!-- Shared brushes (same in both themes) -->
+    <RadialGradientBrush x:Key="EmberGlowBrush"><GradientStop Color="#A6FA243C" Offset="0" /><GradientStop Color="#33FF8A9B" Offset="0.55" /><GradientStop Color="#00FA243C" Offset="1" /></RadialGradientBrush>
+    <RadialGradientBrush x:Key="SpectralGlowBrush"><GradientStop Color="#5922D3EE" Offset="0" /><GradientStop Color="#33FA243C" Offset="0.55" /><GradientStop Color="#00FA243C" Offset="1" /></RadialGradientBrush>
+    <RadialGradientBrush x:Key="EmberBrush" Center="0.5,1" GradientOrigin="0.5,1" RadiusX="0.65" RadiusY="0.65"><GradientStop Color="#CCFF8A9B" Offset="0" /><GradientStop Color="#00FF8A9B" Offset="1" /></RadialGradientBrush>
+    <RadialGradientBrush x:Key="EmberHotBrush" Center="0.5,1" GradientOrigin="0.5,1" RadiusX="0.85" RadiusY="0.85"><GradientStop Color="#F2FF8A9B" Offset="0" /><GradientStop Color="#00FF8A9B" Offset="1" /></RadialGradientBrush>
+    <LinearGradientBrush x:Key="SheenBrush" StartPoint="0.5,0" EndPoint="0.5,1"><GradientStop Color="#4DFFFFFF" Offset="0" /><GradientStop Color="#00FFFFFF" Offset="0.9" /></LinearGradientBrush>
+    <LinearGradientBrush x:Key="DomeBodyBrush" StartPoint="0.5,0" EndPoint="0.5,1"><GradientStop Color="#F21F2937" Offset="0" /><GradientStop Color="#F20A0D13" Offset="1" /></LinearGradientBrush>
+    <RadialGradientBrush x:Key="DomeHighlightBrush" Center="0.3,0.2" GradientOrigin="0.3,0.2" RadiusX="0.7" RadiusY="0.7"><GradientStop Color="#40FFFFFF" Offset="0" /><GradientStop Color="#00FFFFFF" Offset="0.8" /></RadialGradientBrush>
+    <RadialGradientBrush x:Key="DomeCastBrush"><GradientStop Color="#73000000" Offset="0" /><GradientStop Color="#00000000" Offset="1" /></RadialGradientBrush>
+    <LinearGradientBrush x:Key="DeckBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#EB111827" Offset="0" /><GradientStop Color="#E00A0D13" Offset="1" /></LinearGradientBrush>
+    <LinearGradientBrush x:Key="DeckSpectrumBrush" StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF22D3EE" Offset="0" /><GradientStop Color="#FFFACC15" Offset="0.5" /><GradientStop Color="#FFFA243C" Offset="1" /></LinearGradientBrush>
+
+    <!-- ───── Primary: ember fill, sheen, glow and floating points ───── -->
+    <Style x:Key="EmberButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="{ThemeResource OnBrandBrush}" />
+        <Setter Property="FontFamily" Value="{ThemeResource InterMediumFontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Padding" Value="24,0" />
+        <Setter Property="CornerRadius" Value="22" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource FocusBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" RenderTransformOrigin="0.5,0.5">
-                        <Grid.RenderTransform>
-                            <ScaleTransform x:Name="RootScale" ScaleX="1" ScaleY="1"/>
-                        </Grid.RenderTransform>
+                    <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform><ScaleTransform x:Name="RootScale" /></Grid.RenderTransform>
+                        <Border x:Name="Glow" Margin="-18,-12,-18,-20" CornerRadius="40" Opacity="0.55" IsHitTestVisible="False" Background="{StaticResource EmberGlowBrush}" />
+                        <Border x:Name="Fill" Background="{ThemeResource BrandFillBrush}" CornerRadius="{TemplateBinding CornerRadius}" />
+                        <Border x:Name="Ember" CornerRadius="{TemplateBinding CornerRadius}" Background="{StaticResource EmberBrush}" />
+                        <Border x:Name="EmberHot" CornerRadius="{TemplateBinding CornerRadius}" Background="{StaticResource EmberHotBrush}" Opacity="0" />
+                        <Border Margin="1" CornerRadius="{TemplateBinding CornerRadius}" Background="{StaticResource SheenBrush}" IsHitTestVisible="False" />
+                        <Grid x:Name="Points" IsHitTestVisible="False">
+                            <Grid.Clip><RectangleGeometry Rect="0,0,4000,44" /></Grid.Clip>
+                            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
+                            <Ellipse x:Name="P0" Grid.Column="1" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse><Ellipse x:Name="P1" Grid.Column="2" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse><Ellipse x:Name="P2" Grid.Column="2" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse><Ellipse x:Name="P3" Grid.Column="3" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="1,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse><Ellipse x:Name="P4" Grid.Column="4" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse><Ellipse x:Name="P5" Grid.Column="6" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="11,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse><Ellipse x:Name="P6" Grid.Column="7" Width="2" Height="2" Fill="White" Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2,0,0,-8"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform></Ellipse>
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:0.2"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:2.35" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P0" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:0.2"><LinearDoubleKeyFrame KeyTime="0" Value="1.0" /><LinearDoubleKeyFrame KeyTime="0:0:1.998" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:2.35" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:0.5"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:2.5" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P1" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:0.5"><LinearDoubleKeyFrame KeyTime="0" Value="0.7" /><LinearDoubleKeyFrame KeyTime="0:0:2.125" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:2.5" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P2" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:0.1"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:2.2" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P2" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:0.1"><LinearDoubleKeyFrame KeyTime="0" Value="0.8" /><LinearDoubleKeyFrame KeyTime="0:0:1.870" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:2.2" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P3" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:0"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:2.05" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P3" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:0"><LinearDoubleKeyFrame KeyTime="0" Value="0.6" /><LinearDoubleKeyFrame KeyTime="0:0:1.742" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:2.05" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P4" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:0"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:1.9" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P4" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:0"><LinearDoubleKeyFrame KeyTime="0" Value="1.0" /><LinearDoubleKeyFrame KeyTime="0:0:1.615" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:1.9" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P5" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:1.5"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:1.5" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P5" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:1.5"><LinearDoubleKeyFrame KeyTime="0" Value="0.5" /><LinearDoubleKeyFrame KeyTime="0:0:1.275" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:1.5" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P6" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" RepeatBehavior="Forever" BeginTime="0:0:0.2"><LinearDoubleKeyFrame KeyTime="0" Value="0" /><EasingDoubleKeyFrame KeyTime="0:0:2.2" Value="-55"><EasingDoubleKeyFrame.EasingFunction><SineEase EasingMode="EaseInOut" /></EasingDoubleKeyFrame.EasingFunction></EasingDoubleKeyFrame></DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="P6" Storyboard.TargetProperty="Opacity" RepeatBehavior="Forever" BeginTime="0:0:0.2"><LinearDoubleKeyFrame KeyTime="0" Value="0.9" /><LinearDoubleKeyFrame KeyTime="0:0:1.870" Value="0" /><LinearDoubleKeyFrame KeyTime="0:0:2.2" Value="0" /></DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+                        <ContentPresenter x:Name="ContentPresenter" Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}"
+                            FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal">
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="PointerOver">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource BrandAccentHoverBrush}" />
-                                    </VisualState.Setters>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1.02" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1.02" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
+                                <VisualState x:Name="Normal"><Storyboard><DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.55" Duration="0:0:0.300" /><DoubleAnimation Storyboard.TargetName="EmberHot" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.300" /></Storyboard></VisualState>
+                                <VisualState x:Name="PointerOver"><Storyboard><DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1.02" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1.02" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.95" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="EmberHot" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.150" /></Storyboard></VisualState>
                                 <VisualState x:Name="Pressed">
-                                    <VisualState.Setters>
-                                        <Setter Target="ContentPresenter.Opacity" Value="0.8" />
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource BrandAccentBrush}" />
-                                    </VisualState.Setters>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="0.98" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="0.98" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
+                                    <VisualState.Setters><Setter Target="Fill.Background" Value="{ThemeResource BrandFillActiveBrush}" /></VisualState.Setters>
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="EmberHot" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.150" /></Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource SurfaceCardBrush}" />
-                                        <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource TextSecondaryBrush}" />
-                                    </VisualState.Setters>
+                                    <VisualState.Setters><Setter Target="Root.Opacity" Value="0.4" /><Setter Target="Glow.Visibility" Value="Collapsed" /><Setter Target="Points.Visibility" Value="Collapsed" /></VisualState.Setters>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ContentPresenter x:Name="ContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="SecondaryPillButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{ThemeResource SurfaceCardBrush}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimaryBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource InterMediumFontFamily}" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeStandard}" />
-        <Setter Property="Height" Value="{StaticResource ControlHeightStandard}" />
-        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
-        <Setter Property="Padding" Value="{StaticResource ControlPaddingStandard}" />
-        <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource BorderSubtleBrush}" />
+    <!-- ───── Secondary: glass pill, hairline, spectral halo on hover ───── -->
+    <Style x:Key="GlassButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="{ThemeResource InkBrush}" />
+        <Setter Property="Background" Value="{ThemeResource GlassGradientBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource LineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontFamily" Value="{ThemeResource InterMediumFontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="CornerRadius" Value="22" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource FocusBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" RenderTransformOrigin="0.5,0.5">
-                        <Grid.RenderTransform>
-                            <ScaleTransform x:Name="RootScale" ScaleX="1" ScaleY="1"/>
-                        </Grid.RenderTransform>
+                    <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform><CompositeTransform x:Name="RootT" /></Grid.RenderTransform>
+                        <Border x:Name="Glow" Margin="-16,-12,-16,-16" CornerRadius="40" Opacity="0" IsHitTestVisible="False" Background="{StaticResource SpectralGlowBrush}" />
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" />
+                        <ContentPresenter x:Name="ContentPresenter" Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}"
+                            FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal">
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
+                                <VisualState x:Name="Normal"><Storyboard><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.300" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="0" Duration="0:0:0.300"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.150" /></Storyboard></VisualState>
                                 <VisualState x:Name="PointerOver">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource SurfaceCardHoverBrush}" />
-                                    </VisualState.Setters>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1.02" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1.02" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
+                                    <VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource LineStrongBrush}" /></VisualState.Setters>
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.9" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="-2" Duration="0:0:0.300"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
-                                    <VisualState.Setters>
-                                        <Setter Target="ContentPresenter.Opacity" Value="0.8" />
-                                    </VisualState.Setters>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="0.98" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="0.98" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
+                                    <VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource LineStrongBrush}" /></VisualState.Setters>
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.5" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="0" Duration="0:0:0.150"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0:0:0.150" /></Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Disabled">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource SurfaceCardBrush}" />
-                                        <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource TextSecondaryBrush}" />
-                                    </VisualState.Setters>
-                                </VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.4" /></VisualState.Setters></VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ContentPresenter x:Name="ContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="IconButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{ThemeResource TextSecondaryBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource SystemIconsFontFamily}" />
-        <Setter Property="Height" Value="{StaticResource ControlHeightStandard}" />
-        <Setter Property="Width" Value="{StaticResource ControlHeightStandard}" />
-        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
-        <Setter Property="BorderThickness" Value="{StaticResource NoBorderThickness}" />
+    <!-- ───── Dome: molded round button (transport, icon actions) ───── -->
+    <Style x:Key="DomeButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Width" Value="44" /><Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource FocusBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" RenderTransformOrigin="0.5,0.5">
-                        <Grid.RenderTransform>
-                            <ScaleTransform x:Name="RootScale" ScaleX="1" ScaleY="1"/>
-                        </Grid.RenderTransform>
+                    <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform><CompositeTransform x:Name="RootT" /></Grid.RenderTransform>
+                        <Ellipse x:Name="Cast" Margin="2,10,2,-8" IsHitTestVisible="False" Fill="{StaticResource DomeCastBrush}" />
+                        <Ellipse x:Name="Body" Fill="{StaticResource DomeBodyBrush}" Stroke="#1FFFFFFF" StrokeThickness="1" />
+                        <Ellipse x:Name="Hi" Fill="{StaticResource DomeHighlightBrush}" IsHitTestVisible="False" Opacity="0.75" />
+                        <ContentPresenter x:Name="ContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal">
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="PointerOver">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource SurfaceCardBrush}" />
-                                        <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource TextPrimaryBrush}" />
-                                    </VisualState.Setters>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="1.1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="1.1" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <VisualState.Setters>
-                                        <Setter Target="ContentPresenter.Opacity" Value="0.8" />
-                                    </VisualState.Setters>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="{StaticResource DurationFastKeyTime}">
-                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
+                                <VisualState x:Name="Normal"><Storyboard><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="0" Duration="0:0:0.300"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Hi" Storyboard.TargetProperty="Opacity" To="0.75" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.300" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.300" /></Storyboard></VisualState>
+                                <VisualState x:Name="PointerOver"><Storyboard><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="-2" Duration="0:0:0.300"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Hi" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.150" /></Storyboard></VisualState>
+                                <VisualState x:Name="Pressed"><Storyboard><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="1" Duration="0:0:0.150"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="0.95" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="0.95" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="Hi" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0:0:0.150" /></Storyboard></VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.4" /></VisualState.Setters></VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ContentPresenter x:Name="ContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="FolderTextBoxStyle" TargetType="TextBox">
-        <Setter Property="Background" Value="{ThemeResource SurfaceCardBrush}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimaryBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource InterMediumFontFamily}" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeStandard}" />
-        <Setter Property="MinHeight" Value="{StaticResource ControlHeightStandard}" />
-        <Setter Property="CornerRadius" Value="{StaticResource InputCornerRadius}" />
-        <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource BorderSubtleBrush}" />
+    <!-- ───── Play dome: 64px, ember fill, halo ───── -->
+    <Style x:Key="PlayDomeButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Width" Value="64" /><Setter Property="Height" Value="64" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource FocusBrush}" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="TextBox">
-                    <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <ScrollViewer x:Name="ContentElement" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="{StaticResource InputTextMargin}" />
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform><CompositeTransform x:Name="RootT" /></Grid.RenderTransform>
+                        <Ellipse x:Name="Glow" Margin="-22" Fill="{StaticResource EmberGlowBrush}" Opacity="0.6" IsHitTestVisible="False" />
+                        <Ellipse Fill="{ThemeResource BrandFillBrush}" />
+                        <Ellipse Fill="{StaticResource EmberBrush}" />
+                        <Ellipse Fill="{StaticResource DomeHighlightBrush}" Stroke="#40FFFFFF" StrokeThickness="1" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"><Storyboard><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="0" Duration="0:0:0.300"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0:0:0.300" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.300" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.300" /></Storyboard></VisualState>
+                                <VisualState x:Name="PointerOver"><Storyboard><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="-2" Duration="0:0:0.300"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.150" /></Storyboard></VisualState>
+                                <VisualState x:Name="Pressed"><Storyboard><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="1" Duration="0:0:0.150"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="0.95" Duration="0:0:0.150" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="0.95" Duration="0:0:0.150" /></Storyboard></VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.4" /></VisualState.Setters></VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ───── Segment chip (filters): glass pill, brand when checked ───── -->
+    <Style x:Key="SegmentRadioButtonStyle" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{ThemeResource InkMutedBrush}" />
+        <Setter Property="FontFamily" Value="{ThemeResource InterMediumFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource FocusBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid x:Name="Root" Background="Transparent">
+                        <Border x:Name="Surface" CornerRadius="16" BorderThickness="1" BorderBrush="{ThemeResource LineBrush}" Background="{ThemeResource GlassGradientBrush}" />
+                        <ContentPresenter x:Name="ContentPresenter" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
-                                <VisualState x:Name="PointerOver">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.Background" Value="{ThemeResource SurfaceCardHoverBrush}" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                                <VisualState x:Name="Focused">
-                                    <VisualState.Setters>
-                                        <Setter Target="RootGrid.BorderBrush" Value="{ThemeResource BrandAccentBrush}" />
-                                    </VisualState.Setters>
-                                </VisualState>
+                                <VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource LineStrongBrush}" /><Setter Target="ContentPresenter.Foreground" Value="{ThemeResource InkBrush}" /></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Pressed"><VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource LineStrongBrush}" /></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.4" /></VisualState.Setters></VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CheckStates">
+                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource BrandBrush}" /><Setter Target="ContentPresenter.Foreground" Value="{ThemeResource BrandBrush}" /></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Unchecked" />
+                                <VisualState x:Name="Indeterminate" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                     </Grid>
@@ -240,28 +226,95 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CardBorderStyle" TargetType="Border">
-        <Setter Property="Background" Value="{ThemeResource SurfaceCardBrush}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource BorderSubtleBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
-        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+    <!-- ───── Surfaces ───── -->
+    <Style x:Key="GlassCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource GlassGradientBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource LineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="20" />
     </Style>
 
-    <Style x:Key="StatusBadgeBorderStyle" TargetType="Border">
-        <Setter Property="Height" Value="{StaticResource ControlHeightBadge}" />
-        <Setter Property="CornerRadius" Value="{StaticResource BadgeCornerRadius}" />
-        <Setter Property="Padding" Value="{StaticResource StatusBadgePadding}" />
-    </Style>
-
+    <!-- ───── Pop-ups: near-solid, hairline, rounded (tooltips and context menus) ───── -->
     <Style TargetType="ToolTip">
-        <Setter Property="Background" Value="{ThemeResource SurfaceCardBrush}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource BorderSubtleBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
-        <Setter Property="CornerRadius" Value="{StaticResource InputCornerRadius}" />
-        <Setter Property="FontFamily" Value="{StaticResource InterMediumFontFamily}" />
-        <Setter Property="FontSize" Value="{StaticResource ToolTipFontSize}" />
-        <Setter Property="Padding" Value="{StaticResource ToolTipPadding}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MaxWidth" Value="460" />
+    </Style>
+    <Style x:Key="SolidMenuFlyoutPresenterStyle" TargetType="MenuFlyoutPresenter">
+        <Setter Property="Background" Value="{ThemeResource PopupSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource LineStrongBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="4,6" />
+    </Style>
+
+    <!-- ───── Quiet icon button (sidebar toggle, deck repeat) ───── -->
+    <Style x:Key="QuietIconButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Foreground" Value="{ThemeResource InkMutedBrush}" />
+    </Style>
+
+    <!-- ───── Hub tile: large glass card that lifts and glows red on hover ───── -->
+    <Style x:Key="HubTileButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="{ThemeResource InkBrush}" />
+        <Setter Property="Width" Value="250" />
+        <Setter Property="Height" Value="190" />
+        <Setter Property="Padding" Value="22" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource FocusBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform><CompositeTransform x:Name="RootT" /></Grid.RenderTransform>
+                        <Border x:Name="Glow" Margin="-26,-18,-26,-34" CornerRadius="60" Opacity="0" IsHitTestVisible="False" Background="{StaticResource EmberGlowBrush}" />
+                        <Border x:Name="Surface" CornerRadius="24" BorderThickness="1" BorderBrush="{ThemeResource LineBrush}" Background="{ThemeResource GlassGradientBrush}" />
+                        <Border Margin="1" CornerRadius="23" Background="{StaticResource SheenBrush}" Opacity="0.5" IsHitTestVisible="False" />
+                        <ContentPresenter x:Name="ContentPresenter" Padding="{TemplateBinding Padding}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"><Storyboard><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.300" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="0" Duration="0:0:0.350"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.5" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.200" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.200" /></Storyboard></VisualState>
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource BrandBrush}" /></VisualState.Setters>
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.85" Duration="0:0:0.200" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="TranslateY" To="-6" Duration="0:0:0.350"><DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.5" /></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters><Setter Target="Surface.BorderBrush" Value="{ThemeResource BrandBrush}" /></VisualState.Setters>
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0.5" Duration="0:0:0.120" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0:0:0.120" /><DoubleAnimation Storyboard.TargetName="RootT" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0:0:0.120" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.4" /></VisualState.Setters></VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ───── Key cap (Settings › Keyboard Shortcuts) ───── -->
+    <Style x:Key="KeyCapBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource KeyCapBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource LineStrongBrush}" />
+        <Setter Property="BorderThickness" Value="1,1,1,2" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="MinWidth" Value="26" />
+    </Style>
+
+    <!-- ───── Verdict badge shell ───── -->
+    <Style x:Key="VerdictBadgeStyle" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,3" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 
 </ResourceDictionary>
