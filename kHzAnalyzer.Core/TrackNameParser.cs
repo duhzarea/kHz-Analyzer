@@ -21,9 +21,10 @@ public static class TrackNameParser
             key = partes[0];
             partes.RemoveAt(0);
         }
-        if (partes.Count > 0 && IsAllDigits(partes[0]))
+        if (partes.Count > 1 && IsAllDigits(partes[0]))
         {
-            bpm = partes[0];
+            // 60-220 is a tempo; anything else ("01 - Artist - Title") is a track number and is dropped.
+            if (int.TryParse(partes[0], out int n) && n >= 60 && n <= 220) bpm = partes[0];
             partes.RemoveAt(0);
         }
 

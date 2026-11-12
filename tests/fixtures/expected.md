@@ -8,5 +8,5 @@
 - `aiff_48k_24bit.aiff`: OK (48000Hz, 24-bit, Max Freq ~23000Hz)
 - `stereo_21khz.wav`: OK (44100Hz, 16-bit, Channels 2, Max Freq ~21000Hz after mono mix)
 - `tiny_512samples.wav`: ERRO (Not enough samples)
-- `sustained_19400hz.wav`: OK (44100Hz, 16-bit, Max Freq ~19400Hz)
+- `sustained_19400hz.wav`: ABAIXO (44100Hz, 16-bit, Max Freq ~19400Hz; below the 20 kHz threshold)
 - `sustained_18500hz.wav`: ABAIXO (44100Hz, 16-bit, Max Freq ~18500Hz)
