@@ -1,51 +1,80 @@
 # kHz Analyzer
 
-O **kHz Analyzer** é uma ferramenta de análise técnica de áudio desenhada para música eletrônica. Ela varre em lote arquivos de áudio (`.wav`, `.aiff`, `.aif`) de uma pasta (de forma recursiva) e verifica, por meio de análise espectral nativa (FFT), se cada faixa possui energia real detectável até a banda de 19 kHz.
+**Full bandwidth to 20 kHz, or a warning to check.**
 
-## Critério Técnico de Análise
+O kHz Analyzer é um app gratuito para Windows 10 e 11, feito para DJs e produtores. Ele lê cada WAV e AIFF de uma pasta e diz se a faixa realmente chega a **20 kHz**. Tudo abaixo disso recebe **⚠** para você verificar: geralmente é um MP3 salvo como WAV. O app também baixa e corta áudio de links (Download & Trim) e gera prévias MP3 em lote (Snippets).
 
-O aplicativo não se fia apenas nos metadados de taxa de amostragem (ex: 44.1 kHz), pois um arquivo pode ter sofrido um *hard cut* aos 16 kHz no processo de masterização. O critério de avaliação utiliza:
-*   **Banda de Análise:** Verifica a energia espectral entre 18 kHz e 19+ kHz.
-*   **Piso de Ruído:** O limiar de corte é calculado a partir do piso de ruído de quantização do próprio arquivo (derivado da profundidade de bits: 16, 24 ou 32 bits).
-*   **Avaliação Rigorosa:** Só aprova faixas que de fato contêm informação harmônica ou ruído sustentado no limite superior audível (19 kHz). Picos isolados, harmônicos falsos por *aliasing*, ou *upsampling* mal feito são ignorados pela avaliação em 65536 pontos com média de potência (Welch/PSD).
-*   **Processamento:** Os canais (quando estéreo ou superior) são mixados para mono e a Densidade Espectral de Potência (PSD) é calculada usando uma implementação otimizada sem dependências externas.
+![Tela inicial](docs/screenshots/01-start-light.png)
 
-## Estrutura de Pastas
+| | |
+|---|---|
+| ![Tela inicial, tema escuro](docs/screenshots/02-start-dark.png) | ![Analyzer, tema claro](docs/screenshots/03-analyzer-light.png) |
+| ![Analyzer, tema escuro](docs/screenshots/04-analyzer-dark.png) | ![Menu do botão direito](docs/screenshots/05-context-menu.png) |
+| ![Tooltip da faixa](docs/screenshots/06-track-tooltip.png) | ![Troca de tema em andamento](docs/screenshots/07-theme-reveal.png) |
+| ![Settings e atalhos](docs/screenshots/08-settings-shortcuts.png) | |
 
-*   **`KhzAnalyzer`:** Camada de apresentação e orquestração. Contém o projeto principal em C# / WinUI 3 (Windows App SDK), responsável pela interface gráfica, interações do usuário e paralelismo na execução das análises.
-*   **`kHzAnalyzer.Core`:** Motor de análise matemática e DSP (Digital Signal Processing). Totalmente nativo em C#, sem dependências externas. Contém leitores próprios para cabeçalhos WAV/AIFF e a implementação da FFT.
-*   **`kHzAnalyzer.ConsoleTest`:** Projeto auxiliar para testes CLI (Command Line Interface), utilizado para a validação matemática do motor e testes unitários/funcionais diretos contra bibliotecas de referência.
-*   **`docs`:** Documentação do projeto, documentação do design system e instruções de release.
-*   **`_quarentena`:** Diretório que guarda implementações obsoletas (ex: interfaces antigas em Python/Eel) e arquivos descartados. Ignorado pelo Git.
+## O que ele faz
 
-## Estado Atual
+- **Analyzer:** varre a pasta (com subpastas), mede até onde vai o conteúdo espectral real de cada faixa e dá o veredito:
+  - **Reaches 20 kHz+**: passou.
+  - **⚠ Below 20 kHz, check**: abaixo de 20 kHz, verifique.
+  - **⚠ MP3 range (19 kHz), tolerated**: MP3 entre 19 e 20 kHz; tolerado, mas ainda com aviso.
+  - **Unreadable file** ou **Not downloaded**: arquivo ilegível ou que está só na nuvem.
 
-*   O motor de análise matemática (`kHzAnalyzer.Core`) está **validado, robusto e finalizado**, dispensando dependências de terceiros (como NAudio ou MathNet).
-*   A interface (`KhzAnalyzer`) está estabelecida em **WinUI 3**, integrando-se perfeitamente com o motor de análise via C#. 
-*   **Geração de Relatórios:** Implementação nativa (`.docx` e `.csv`) totalmente concluída dentro de `kHzAnalyzer.Core` (sem dependências como OpenXml), rodando de forma paralela via Task.
+  Os relatórios em .docx e .csv mostram sempre o valor exato em Hz, para você decidir se usa o arquivo.
+- **Now Playing:** toca WAV e AIFF direto da tabela (duplo clique, Enter ou Space), com forma de onda, timeline arrastável, volume e repetir.
+- **Download & Trim:** cola um link do YouTube ou SoundCloud e salva em WAV, M4A, MP3 ou MP4, inteiro ou cortado por tempo (FFmpeg e yt-dlp).
+- **Snippets:** cria uma prévia MP3 de cada faixa numa subpasta Snippets, sem tocar nos originais.
 
-### Dependências
-A fim de fornecer um sistema de cache robusto para aceleração de re-análises, o projeto utiliza `Microsoft.Data.Sqlite`. Isso traz uma biblioteca nativa subjacente (`e_sqlite3.dll`) que é empacotada no aplicativo final via MSIX.
+## Como a medição funciona
 
-*   **Em desenvolvimento:** Redesign visual premium (Design System) da interface WinUI 3 (Fases 2 e 3).
+- O app não confia na taxa de amostragem do arquivo: um WAV de 44,1 kHz pode ter um corte em 16 kHz.
+- A leitura é em streaming, do início ao fim da faixa, com FFT de 65.536 pontos, sobreposição de 50%, janela Hann e média de potência (Welch).
+- O limiar vem do piso de ruído da própria profundidade de bits, mais 3 dB. A frequência máxima medida é a mais alta com conteúdo sustentado.
+- A regra está em `kHzAnalyzer.Core/Verdict.cs`: limite de 20.000 Hz e tolerância de MP3 a partir de 19.000 Hz.
+- As análises ficam em cache (SQLite) e reabrir uma pasta já analisada é quase instantâneo.
 
-## Como Rodar em Desenvolvimento
+## Atalhos de teclado
 
-Para executar o aplicativo a partir do código-fonte:
+| Atalho | Ação |
+|---|---|
+| Ctrl+B | Mostrar ou ocultar a barra lateral |
+| Ctrl+0 / 1 / 2 / 3 | Início, Analyzer, Download & Trim, Snippets |
+| Ctrl+, · Ctrl+/ · F1 | Settings, lista de atalhos, About |
+| Ctrl+Shift+L | Alternar tema claro e escuro |
+| Ctrl+O · F5 · Esc · Ctrl+E | Escolher pasta, analisar, cancelar, exportar |
+| Ctrl+F · Ctrl+I · Del | Buscar, informações da faixa, remover da lista |
+| Space · Ctrl+← / → · Shift+← / → | Play/pause, faixa anterior/próxima, voltar/avançar 10 s |
 
-1. Certifique-se de ter o .NET SDK (versão 10.0 ou apropriada instalada) e o Windows App SDK.
-2. Navegue até a pasta da interface gráfica:
-   ```cmd
-   cd "KhzAnalyzer"
-   ```
-   ```cmd
-   "1 - Rodar kHz Analyzer.bat"
-   ```
-   *Alternativa:* Abra o repositório em uma IDE compatível (Visual Studio) e defina o projeto `KhzAnalyzer` como inicialização.
+A lista completa fica em **Settings › Keyboard Shortcuts**.
 
-## Próximas Fases (Roadmap)
+## Instalação
 
-Conforme as novas especificações, o desenvolvimento seguirá com:
-*   **Fase 5A:** Espectrograma de áudio (tempo × frequência, estilo Spek) com processamento sob demanda, preservação de transientes e escala de cor perceptualmente monotônica.
-*   **Fase 5B:** Detecção de Key (tonalidade) e BPM com extração nativa via DSP (fluxo espectral, autocorrelação e cromagrama) e comparação com metadados do nome do arquivo.
-*(Ambas posicionadas após a Fase 5 e antes da Fase 6 de Validação Funcional).*
+Baixe na página de Releases:
+
+- **`kHzAnalyzer-x.y.z-setup.exe`**: instalador que deixa escolher a pasta e o disco (C:, G:, etc.) e não pede permissão de administrador.
+- **`kHzAnalyzer-x.y.z-portable.zip`**: versão portátil; é só extrair e abrir `kHzAnalyzer.exe`.
+
+As configurações ficam em `%LOCALAPPDATA%\kHzAnalyzer` e o cache em `%APPDATA%\kHzAnalyzer`. Nada é enviado para a internet; só o Download & Trim acessa o site do link que você colar.
+
+## Estrutura
+
+- **`KhzAnalyzer/`**: interface WinUI 3 (.NET 10, sem pacote MSIX). Telas em `Pages/`, controles próprios em `Controls/` (espectro, player, timeline, fundo animado), player em `Services/`, tokens e estilos em `Styles/`.
+- **`kHzAnalyzer.Core/`**: motor de análise em C# puro, com leitores WAV/AIFF, FFT, veredito, cache e relatórios .docx/.csv. Downloads e snippets ficam em `Media/`.
+- **`tests/`**: testes de regressão e arquivos de referência (`fixtures/expected.md`).
+- **`tools/`**: verificação do motor (`kHzAnalyzer.ConsoleTest --verificar`), build do instalador (`build-release.ps1`) e scripts de teste da interface.
+- **`docs/`**: decisões da spec (`spec-v2.1-decisions.md`) e prints (`screenshots/`).
+
+## Desenvolvimento
+
+```powershell
+dotnet build KhzAnalyzer\KhzAnalyzer.csproj -c Debug -p:Platform=x64
+dotnet test tests\KhzAnalyzer.RegressionTests
+powershell -ExecutionPolicy Bypass -File tools\build-release.ps1   # instalador e zip em dist\
+```
+
+O histórico de versões, com bugs e correções, está no [CHANGELOG](CHANGELOG.md).
+
+---
+
+Dev: Eduardo Oliveira (DUHZZ)
