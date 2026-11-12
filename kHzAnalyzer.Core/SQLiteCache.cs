@@ -10,7 +10,7 @@ public class AnalysisCache : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly object _lock = new object();
-    private const string EngineVersion = "v3_19khz_astreaming";
+    private const string EngineVersion = "v3_19khz_astreaming" /* name kept on purpose: the cache stores measurements, and the 20 kHz verdict is derived from them, so old entries stay valid */;
 
     public AnalysisCache(string dbPath)
     {

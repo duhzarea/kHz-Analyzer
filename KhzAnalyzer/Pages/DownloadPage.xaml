@@ -101,7 +101,7 @@
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Streaming sources are lossy. Saving as WAV does not restore quality, and such files may fail the 19 kHz check."
+                            Text="Streaming sources are lossy. Saving as WAV does not restore quality, and such files are usually flagged by the 20 kHz check."
                             TextWrapping="Wrap" />
                     </StackPanel>
 

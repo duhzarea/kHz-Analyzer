@@ -49,16 +49,17 @@ public static class DocxReport
   <w:body>");
 
         // Title
-        sb.Append(@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val=""36""/></w:rPr><w:t>Relatório de Análise Espectral — 19kHz</w:t></w:r></w:p>");
+        sb.Append(@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val=""36""/></w:rPr><w:t>Spectral Analysis Report — 20 kHz threshold</w:t></w:r></w:p>");
 
         // Summary
         int total = results.Count();
-        int ok = results.Count(r => r.EhOk);
-        int abaixo = results.Count(r => r.EhAbaixo);
-        int offline = results.Count(r => r.IsOffline);
-        int erros = total - ok - abaixo - offline;
+        int ok = results.Count(r => r.Kind == VerdictKind.Pass);
+        int mp3 = results.Count(r => r.Kind == VerdictKind.Mp3Range);
+        int abaixo = results.Count(r => r.Kind == VerdictKind.Check);
+        int offline = results.Count(r => r.Kind == VerdictKind.NotDownloaded);
+        int erros = results.Count(r => r.Kind == VerdictKind.Unreadable);
 
-        sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} faixas analisadas  ·  {ok} OK  ·  {abaixo} abaixo de 19kHz  ·  {offline} offline  ·  {erros} erros</w:t></w:r></w:p>");
+        sb.Append($@"<w:p><w:pPr><w:jc w:val=""center""/></w:pPr><w:r><w:rPr><w:i/><w:color w:val=""555555""/><w:sz w:val=""20""/></w:rPr><w:t>{total} tracks  ·  {ok} reach 20 kHz+  ·  {Verdict.Attention} {abaixo} below 20 kHz  ·  {Verdict.Attention} {mp3} MP3 in the 19 kHz range  ·  {erros} unreadable  ·  {offline} not downloaded</w:t></w:r></w:p>");
         sb.Append(@"<w:p/>"); // empty line
 
         // Table
@@ -77,7 +78,7 @@ public static class DocxReport
 
         // Header Row
         sb.Append(@"<w:tr><w:trPr><w:tblHeader/></w:trPr>");
-        string[] headers = { "FAIXA", "KEY", "BPM", "TIPO", "SAMPLE RATE", "BITS", "FREQ. MÁX.", "VEREDITO" };
+        string[] headers = { "TRACK", "KEY", "BPM", "TYPE", "SAMPLE RATE", "BITS", "MAX FREQ.", "VERDICT" };
         foreach (var h in headers)
         {
             sb.Append($@"<w:tc>
@@ -94,7 +95,7 @@ public static class DocxReport
         });
 
         int rowIndex = 0;
-        var culture = new System.Globalization.CultureInfo("pt-BR");
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
 
         foreach (var r in ordered)
         {
@@ -105,30 +106,18 @@ public static class DocxReport
             string bits = r.Erro != null ? "-" : r.Bits.ToString();
             string freq = r.Erro != null ? "-" : r.FreqMaximaDetectada.ToString("N0", culture) + " Hz";
             
-            string vereditoTxt = r.Erro != null ? "ERRO: " + r.Erro : (r.EhOk ? "OK — chega em 19kHz+" : r.Veredito);
+            string vereditoTxt = Verdict.Label(r.Kind);
             
             string vColor = "000000";
             bool vBold = false;
             
-            if (r.IsOffline)
+            switch (r.Kind)
             {
-                vColor = "8B8B8B"; // Gray
-                vBold = false;
-                vereditoTxt = r.Erro ?? "Offline";
-            }
-            else if (r.Erro != null)
-            {
-                vColor = "D35400"; // Orange
-                vBold = true;
-            }
-            else if (r.EhAbaixo)
-            {
-                vColor = "C0392B"; // Red
-                vBold = true;
-            }
-            else
-            {
-                vColor = "2E7D32"; // Green
+                case VerdictKind.NotDownloaded: vColor = "64748B"; break;
+                case VerdictKind.Unreadable: vColor = "B45309"; vBold = true; break;
+                case VerdictKind.Check: vColor = "B91C1C"; vBold = true; break;
+                case VerdictKind.Mp3Range: vColor = "B45309"; vBold = true; break;
+                default: vColor = "166534"; break;
             }
 
             string fill = rowIndex % 2 == 1 ? "F5F5F5" : "FFFFFF";

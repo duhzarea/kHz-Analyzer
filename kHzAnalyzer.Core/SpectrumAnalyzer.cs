@@ -8,7 +8,7 @@ namespace KhzAnalyzer.Core;
 
 public static class SpectrumAnalyzer
 {
-    public const double FreqAlvo = 19000;
+    public const double FreqAlvo = Verdict.ThresholdHz; // 20 kHz since 2026-11-11 (was 19 kHz); the measurement itself is unchanged
     public const double MargemDb = 3.0;
 
     public static double PisoDeRuidoTeorico(int bits)

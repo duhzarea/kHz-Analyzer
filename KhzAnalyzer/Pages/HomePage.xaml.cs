@@ -287,7 +287,7 @@ public sealed partial class HomePage : Page
     {
         TotalText.Text = _todos.Count.ToString();
         OkText.Text = _todos.Count(r => r.Status == StatusFaixa.Ok).ToString();
-        AbaixoText.Text = _todos.Count(r => r.Status == StatusFaixa.Abaixo).ToString();
+        AbaixoText.Text = _todos.Count(r => r.Status is StatusFaixa.Abaixo or StatusFaixa.Mp3).ToString();
         ErroText.Text = _todos.Count(r => r.Status == StatusFaixa.Erro).ToString();
         OfflineText.Text = _todos.Count(r => r.Status == StatusFaixa.Offline).ToString();
     }
@@ -309,7 +309,7 @@ public sealed partial class HomePage : Page
 
         bool statusOk =
             (FiltroOk.IsChecked == true && linha.Status == StatusFaixa.Ok) ||
-            (FiltroProblemas.IsChecked == true && (linha.Status == StatusFaixa.Abaixo || linha.Status == StatusFaixa.Erro)) ||
+            (FiltroProblemas.IsChecked == true && linha.PrecisaVerificar) ||
             (FiltroOk.IsChecked != true && FiltroProblemas.IsChecked != true);
 
         string busca = BuscaBox?.Text?.Trim() ?? "";
@@ -352,8 +352,8 @@ public sealed partial class HomePage : Page
             // Cria cópia segura para processamento assíncrono
             var resultados = _resultadosRaw.ToList();
             
-            string csvPath = Path.Combine(pastaDestino.Path, "relatorio_19khz.csv");
-            string docxPath = Path.Combine(pastaDestino.Path, "Relatorio_19kHz.docx");
+            string csvPath = Path.Combine(pastaDestino.Path, "relatorio_20khz.csv");
+            string docxPath = Path.Combine(pastaDestino.Path, "Relatorio_20kHz.docx");
 
             await Task.Run(() =>
             {

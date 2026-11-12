@@ -16,7 +16,7 @@
 
             <StackPanel Spacing="8">
                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="What the Analyzer checks" />
-                <TextBlock TextWrapping="Wrap" Text="Each WAV or AIFF file is read from start to finish. A track passes when it has sustained spectral content up to 19 kHz or more. A track that stops lower was most likely made from a lossy source, such as an MP3 saved again as WAV." />
+                <TextBlock TextWrapping="Wrap" Text="Each WAV or AIFF file is read from start to finish. A track passes when it has sustained spectral content up to 20 kHz or more. Anything lower is marked with a warning sign for you to check: it was most likely made from a lossy source, such as an MP3 saved again as WAV. Original MP3 files whose content stops between 19 and 20 kHz, where the encoder cuts on purpose, are marked as tolerated. Reports always show the measured frequency in Hz, so you decide." />
             </StackPanel>
 
             <StackPanel Spacing="8">

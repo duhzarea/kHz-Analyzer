@@ -246,13 +246,13 @@ static class Program
         foreach (var r in resultados.Values.Where(r => Status(r) != "OK").OrderBy(r => r.Arquivo, StringComparer.OrdinalIgnoreCase))
             secE.AppendLine($"   [{Status(r),-6}] {r.FreqMaximaDetectada.ToString("F1", Inv),9}  {Path.GetFileName(r.Arquivo)}  {r.Erro}");
 
-        // ---- F: effect of 20 kHz -> 19 kHz
+        // ---- F: tracks in the 19 kHz range (flagged under the 20 kHz rule)
         var mudaram = resultados.Values
             .Where(r => r.Erro is null && r.FreqMaximaDetectada >= 19000 && r.FreqMaximaDetectada < 20000)
             .OrderBy(r => r.FreqMaximaDetectada).ToList();
         foreach (var r in mudaram)
             secF.AppendLine($"{r.FreqMaximaDetectada.ToString("F1", Inv),9} Hz  {Path.GetFileName(r.Arquivo)}");
-        secF.AppendLine($"TOTAL: {mudaram.Count} track(s) between 19000 and 19999 Hz (BELOW at 20 kHz, OK at 19 kHz)");
+        secF.AppendLine($"TOTAL: {mudaram.Count} track(s) between 19000 and 19999 Hz (flagged for checking under the 20 kHz rule)");
 
         // ---- rigorous set: fixtures + every non-OK track + every borderline track
         var rigoroso = new List<string>(fixtures);
@@ -343,7 +343,7 @@ static class Program
         Sec("C. IDENTITY: ORIGINAL IN-MEMORY METHOD vs STREAMING ENGINE", secC);
         Sec("D. THREAD SAFETY: 1 WORKER vs 4 WORKERS", secD);
         Sec("E. PERFORMANCE", secE);
-        Sec("F. EFFECT OF THE 20 kHz -> 19 kHz THRESHOLD", secF);
+        Sec("F. TRACKS BETWEEN 19 AND 20 kHz", secF);
         Sec("G. LEFTOVER \"20 kHz\" STRINGS", secG);
         Sec("H. CACHE: REPEATED OPEN", secH);
 
@@ -355,7 +355,7 @@ static class Program
 
     // --------------------------------------------------------------- helpers --
 
-    static string Status(AnalysisResult r) => r.Erro is not null ? "ERRO" : r.EhOk ? "OK" : "ABAIXO";
+    static string Status(AnalysisResult r) => r.Kind switch { VerdictKind.Pass => "OK", VerdictKind.Mp3Range => "MP3-19K", VerdictKind.Check => "ABAIXO", _ => "ERRO" };
 
     static bool IsDebug()
     {

@@ -21,6 +21,9 @@ public sealed class AnalysisResult
     // Indica se a faixa não pôde ser analisada porque estava apenas na nuvem
     public bool IsOffline { get; init; }
 
-    public bool EhOk => Erro is null && Veredito.StartsWith("OK");
-    public bool EhAbaixo => Erro is null && Veredito.StartsWith("ABAIXO");
+    // Derived from the measured frequency through Verdict (20 kHz rule), never from the stored text,
+    // so results cached under the old 19 kHz rule are judged by the current rule without re-analysis.
+    public VerdictKind Kind => Verdict.Of(this);
+    public bool EhOk => Kind is VerdictKind.Pass or VerdictKind.Mp3Range;
+    public bool EhAbaixo => Kind is VerdictKind.Check;
 }

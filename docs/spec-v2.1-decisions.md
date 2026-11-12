@@ -85,7 +85,7 @@ Behaviour to preserve:
 
 ## 8. About
 
-Built-in user guide in English: what each tool does, how the 19 kHz check works and
+Built-in user guide in English: what each tool does, how the 20 kHz check works and
 its known limits, shortcuts, bundled third-party software and licences (Inter font,
 FFmpeg, yt-dlp, SQLite).
 
