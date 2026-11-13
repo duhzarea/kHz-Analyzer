@@ -19,6 +19,7 @@ Redesign completo da interface (padrão "Proposta B"), player integrado, atalhos
 - **Settings › Animations:** On (padrão), Follow Windows ou Off.
 - Item **Home** na barra lateral e a tecla **Home** para voltar à tela inicial.
 - **Theme, About e Settings** na mesma régua dos outros itens da barra lateral, 20 px acima da borda da janela.
+- **Relevo de vidro** nos três módulos da tela inicial e no botão de tema: borda chanfrada com a luz principal no canto superior esquerdo, linha estrutural no meio e retorno quente do vermelho da marca embaixo à direita.
 - Licença **GPL-3.0**.
 - Fontes da marca: Instrument Serif (títulos), Inter (texto) e Geist Mono (dados), com as licenças OFL incluídas.
 
@@ -31,6 +32,7 @@ Redesign completo da interface (padrão "Proposta B"), player integrado, atalhos
 - **Troca de tema mostrava partes faltando** durante a transição: as animações de entrada não gravavam o valor final, e a foto do tema antigo saía sem esses elementos.
 - **Tema escuro marrom/azulado:** o acrílico deixava o papel de parede atravessar. Uma camada escura neutra foi adicionada.
 - **Enter na tabela não tocava a faixa:** o item da lista consumia a tecla.
+- **Bolinha da timeline iluminada de cima**, destoando do resto da tela, que é iluminado do canto superior esquerdo. Agora é uma conta de vidro na mesma luz, com retorno quente do trilho vermelho e sombra de contato.
 - **Botões do player grandes demais**, vazando para fora do card. Agora têm 36 e 50 px e ficam dentro do player.
 - **Pop-ups e tooltips translúcidos demais**, com a tabela vazando por trás. Agora têm fundo quase sólido, borda e sombra.
 - **Hover quase invisível nos botões** (diferença média medida de 3,6 em 255). Os novos botões têm brilho, elevação e reflexo.

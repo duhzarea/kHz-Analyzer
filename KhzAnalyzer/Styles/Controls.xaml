@@ -286,8 +286,12 @@
                     <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
                         <Grid.RenderTransform><CompositeTransform x:Name="RootT" /></Grid.RenderTransform>
                         <Border x:Name="Glow" Margin="-26,-18,-26,-34" CornerRadius="60" Opacity="0" IsHitTestVisible="False" Background="{StaticResource EmberGlowBrush}" />
-                        <Border x:Name="Surface" CornerRadius="24" BorderThickness="1" BorderBrush="{ThemeResource LineBrush}" Background="{ThemeResource GlassGradientBrush}" />
-                        <Border Margin="1" CornerRadius="23" Background="{StaticResource SheenBrush}" Opacity="0.5" IsHitTestVisible="False" />
+                        <!-- Bevelled edge, painted in layers: the body, the lit rim that carries the
+                             key light and the warm bounce, a thin inner shade for thickness, and the
+                             sheen across the top face. -->
+                        <Border x:Name="Surface" CornerRadius="24" BorderThickness="1.5" BorderBrush="{ThemeResource BevelRimBrush}" Background="{ThemeResource GlassGradientBrush}" />
+                        <Border Margin="1.5" CornerRadius="22.5" BorderThickness="1" BorderBrush="{ThemeResource BevelInnerBrush}" IsHitTestVisible="False" />
+                        <Border Margin="2.5" CornerRadius="21.5" Background="{StaticResource SheenBrush}" Opacity="0.5" IsHitTestVisible="False" />
                         <ContentPresenter x:Name="ContentPresenter" Padding="{TemplateBinding Padding}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <VisualStateManager.VisualStateGroups>
