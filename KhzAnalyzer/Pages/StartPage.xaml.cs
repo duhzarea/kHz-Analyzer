@@ -21,6 +21,7 @@ public sealed partial class StartPage : Page
     public StartPage()
     {
         InitializeComponent();
+        VersionRun.Text = VersionLabel;
         _flip = DispatcherQueue.CreateTimer();
         _flip.Interval = TimeSpan.FromMilliseconds(3600);
         _flip.Tick += (_, _) =>
@@ -73,4 +74,35 @@ public sealed partial class StartPage : Page
     }
 
     private void OpenAnalyzer_Click(object sender, RoutedEventArgs e) => App.MainWindow?.OpenModule("analyzer");
+
+    private void Utility_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.Tag is string tag) App.MainWindow?.OpenModule(tag);
+    }
+
+    // ───── Build mark: "v0.12.0 · Crafted by DUHZZ"
+
+    public const string ProfileUrl = "https://github.com/duhzarea";
+
+    /// <summary>"v0.12.0", read from the assembly so it always matches the build (csproj &lt;Version&gt;).</summary>
+    public static string VersionLabel
+    {
+        get
+        {
+            var v = typeof(App).Assembly.GetName().Version ?? new Version(0, 0, 0);
+            return $"v{v.Major}.{v.Minor}.{Math.Max(v.Build, 0)}";
+        }
+    }
+
+    // 55 % at rest; full strength and a red glow on hover or keyboard focus.
+    private void BuildMark_Hot(object sender, RoutedEventArgs e) { BuildMark.Opacity = 1; BuildGlow.Opacity = 1; }
+
+    private void BuildMark_Cold(object sender, RoutedEventArgs e)
+    {
+        if (BuildMark.FocusState is FocusState.Keyboard) return;
+        BuildMark.Opacity = 0.55; BuildGlow.Opacity = 0;
+    }
+
+    private async void BuildMark_Click(object sender, RoutedEventArgs e) =>
+        await Windows.System.Launcher.LaunchUriAsync(new Uri(ProfileUrl));
 }

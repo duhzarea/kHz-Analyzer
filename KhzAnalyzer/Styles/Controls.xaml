@@ -260,6 +260,17 @@
         <Setter Property="Foreground" Value="{ThemeResource InkMutedBrush}" />
     </Style>
 
+    <!-- Start screen utilities (Settings, About): label + icon, quiet until hovered -->
+    <Style x:Key="StartUtilityButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="Foreground" Value="{ThemeResource InkMutedBrush}" />
+    </Style>
+
     <!-- ───── Hub tile: large glass card that lifts and glows red on hover ───── -->
     <Style x:Key="HubTileButtonStyle" TargetType="Button">
         <Setter Property="Foreground" Value="{ThemeResource InkBrush}" />

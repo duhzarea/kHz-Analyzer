@@ -347,23 +347,95 @@
                 Margin="-56,0,-56,0"
                 BorderBrush="{ThemeResource LineBrush}"
                 BorderThickness="0,1,0,0">
+                <!--  Utilities, on the same side as the sidebar keeps them  -->
                 <StackPanel
-                    HorizontalAlignment="Center"
+                    Margin="20,0,0,0"
+                    HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Orientation="Horizontal"
-                    Spacing="10">
-                    <Ellipse
-                        Width="6"
-                        Height="6"
-                        VerticalAlignment="Center"
-                        Fill="{StaticResource AppleRedBrush}" />
-                    <TextBlock
-                        CharacterSpacing="120"
-                        FontFamily="{StaticResource MonoFontFamily}"
-                        FontSize="11.5"
-                        Foreground="{ThemeResource InkMutedBrush}"
-                        Text="Dev: Eduardo Oliveira (DUHZZ)" />
+                    Spacing="4">
+                    <Button
+                        x:Name="StartSettings"
+                        AutomationProperties.Name="Settings"
+                        Click="Utility_Click"
+                        Style="{StaticResource StartUtilityButtonStyle}"
+                        Tag="settings"
+                        ToolTipService.ToolTip="Settings (Ctrl+,)">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="13" Glyph="&#xE713;" />
+                            <TextBlock Text="Settings" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        x:Name="StartAbout"
+                        AutomationProperties.Name="About"
+                        Click="Utility_Click"
+                        Style="{StaticResource StartUtilityButtonStyle}"
+                        Tag="about"
+                        ToolTipService.ToolTip="About (F1)">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="13" Glyph="&#xE946;" />
+                            <TextBlock Text="About" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
+
+                <!--  Build mark: version + credit. Quiet at rest, lights up on hover, opens GitHub.  -->
+                <Button
+                    x:Name="BuildMark"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Crafted by DUHZZ, open GitHub profile"
+                    Click="BuildMark_Click"
+                    GotFocus="BuildMark_Hot"
+                    LostFocus="BuildMark_Cold"
+                    Opacity="0.55"
+                    PointerEntered="BuildMark_Hot"
+                    PointerExited="BuildMark_Cold"
+                    ToolTipService.ToolTip="github.com/duhzarea">
+                    <Button.OpacityTransition>
+                        <ScalarTransition Duration="0:0:0.22" />
+                    </Button.OpacityTransition>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Padding="10,6" Background="Transparent">
+                                <ContentPresenter />
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Grid
+                            Width="14"
+                            Height="14"
+                            VerticalAlignment="Center">
+                            <Ellipse x:Name="BuildGlow" Opacity="0">
+                                <Ellipse.OpacityTransition>
+                                    <ScalarTransition Duration="0:0:0.22" />
+                                </Ellipse.OpacityTransition>
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush>
+                                        <GradientStop Offset="0" Color="#B3FA243C" />
+                                        <GradientStop Offset="1" Color="#00FA243C" />
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <Ellipse
+                                Width="6"
+                                Height="6"
+                                Fill="{StaticResource AppleRedBrush}" />
+                        </Grid>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            CharacterSpacing="80"
+                            FontFamily="{StaticResource MonoFontFamily}"
+                            FontSize="11.5"
+                            Foreground="{ThemeResource InkBrush}">
+                            <Run x:Name="VersionRun" Text="v0.0.0" />
+                            <Run Foreground="{ThemeResource InkMutedBrush}" Text=" · Crafted by " />
+                            <Run FontWeight="SemiBold" Text="DUHZZ" />
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
             </Grid>
         </Grid>
     </Grid>

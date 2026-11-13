@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Windows.System;
 
 namespace KhzAnalyzer.Utils;
@@ -34,7 +34,7 @@ public static class Shortcuts
     public static readonly IReadOnlyList<Shortcut> All = new List<Shortcut>
     {
         new(Sidebar, "Navigation", "Show or hide the sidebar", VirtualKey.B, Ctrl: true),
-        new(Home, "Navigation", "Start screen", VirtualKey.Number0, Ctrl: true, Display: "0"),
+        new(Home, "Navigation", "Start screen", VirtualKey.Home, Display: "Home"),
         new(Analyzer, "Navigation", "Analyzer", VirtualKey.Number1, Ctrl: true, Display: "1"),
         new(Download, "Navigation", "Download & Trim", VirtualKey.Number2, Ctrl: true, Display: "2"),
         new(Snippets, "Navigation", "Snippets", VirtualKey.Number3, Ctrl: true, Display: "3"),

@@ -39,7 +39,7 @@ O kHz Analyzer é um app gratuito para Windows 10 e 11, feito para DJs e produto
 | Atalho | Ação |
 |---|---|
 | Ctrl+B | Mostrar ou ocultar a barra lateral |
-| Ctrl+0 / 1 / 2 / 3 | Início, Analyzer, Download & Trim, Snippets |
+| Home · Ctrl+1 / 2 / 3 | Início, Analyzer, Download & Trim, Snippets |
 | Ctrl+, · Ctrl+/ · F1 | Settings, lista de atalhos, About |
 | Ctrl+Shift+L | Alternar tema claro e escuro |
 | Ctrl+O · F5 · Esc · Ctrl+E | Escolher pasta, analisar, cancelar, exportar |
@@ -75,6 +75,10 @@ powershell -ExecutionPolicy Bypass -File tools\build-release.ps1   # instalador 
 
 O histórico de versões, com bugs e correções, está no [CHANGELOG](CHANGELOG.md).
 
+## Licença
+
+Copyright © 2026 Eduardo Oliveira (DUHZZ). Distribuído sob a [GNU GPL v3](LICENSE): você pode usar, estudar, modificar e redistribuir, desde que versões modificadas continuem abertas, sob a mesma licença, e mantenham os créditos.
+
 ---
 
-Dev: Eduardo Oliveira (DUHZZ)
+v0.12.0 · Crafted by [DUHZZ](https://github.com/duhzarea)

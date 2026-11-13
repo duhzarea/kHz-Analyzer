@@ -1,7 +1,7 @@
 # kHz Analyzer — Spec v2.1: decisions that amend the Master Specification v2.0
 
 Date: 2026-11-10. Decided by the product owner (DUHZZ). Where this file and
-`kHz_Analyzer_Master_Specification.md` disagree, this file wins.
+the master specification (kept outside this repository) disagree, this file wins.
 
 ## 1. Product and distribution
 
@@ -18,7 +18,7 @@ Date: 2026-11-10. Decided by the product owner (DUHZZ). Where this file and
 - Engine: full-signal streaming, FFT window 65 536, 50 % overlap, mean aggregation,
   theoretical noise floor per bit depth, 3 dB margin. These parameters are frozen.
 - Sampling-based shortcuts are rejected (see `limite-tamanho-janela.md`).
-- Verified on 2026-11-10 (`docs/handoff/verificacao.txt`): 10/10 fixtures, streaming
+- Verified on 2026-11-10 (local verification run): 10/10 fixtures, streaming
   identical to the original in-memory method on 43 files, identical with 1 and 4 workers.
 
 ## 3. Look and feel

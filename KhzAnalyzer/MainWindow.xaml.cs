@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using KhzAnalyzer.Pages;
@@ -65,6 +65,8 @@ public sealed partial class MainWindow : Window
         RootGrid.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(Root_PreviewKeyDown), true);
         NavView.PaneOpened += (_, _) => SyncSidebarUi();
         NavView.PaneClosed += (_, _) => SyncSidebarUi();
+        NavView.ItemInvoked += NavView_ItemInvoked;
+        NavView.Loaded += NavView_Loaded;
 
         Activated += (_, e) =>
         {
@@ -91,7 +93,7 @@ public sealed partial class MainWindow : Window
             RootGrid.Background = dark ? new SolidColorBrush(Windows.UI.Color.FromArgb(0xC8, 0x0A, 0x0C, 0x11)) : null;
         AppWindow.TitleBar.PreferredTheme = dark ? TitleBarTheme.Dark : TitleBarTheme.Light;
         ThemeKnob.HorizontalAlignment = dark ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-        ThemeGlyph.Glyph = dark ? "" : ""; // moon : sun
+        ThemeGlyph.Glyph = dark ? "\uE708" : "\uE706"; // moon : sun
     }
 
     /// <summary>Switches theme with the circular reveal, growing from <paramref name="origin"/> (a point in the window).</summary>
@@ -116,8 +118,41 @@ public sealed partial class MainWindow : Window
         return p;
     }
 
-    private void ThemeToggle_Click(object sender, RoutedEventArgs e) =>
-        SwitchTheme(IsDark ? "Light" : "Dark", CenterOf(ThemeToggle));
+    /// <summary>Where the theme reveal grows from: the switch when the sidebar is open, the item's icon when it is compact.</summary>
+    private Point ThemeOrigin() => NavView.IsPaneOpen ? CenterOf(ThemeToggle) : CenterOf(NavTheme);
+
+    private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        if (ReferenceEquals(args.InvokedItemContainer, NavTheme))
+            SwitchTheme(IsDark ? "Light" : "Dark", ThemeOrigin());
+    }
+
+    /// <summary>Lifts the footer group (Theme, About, Settings) off the window edge so it keeps the sidebar's rhythm.</summary>
+    private void NavView_Loaded(object sender, RoutedEventArgs e) => LiftFooter();
+
+    /// <summary>
+    /// Lifts the footer group (Theme, About, Settings) 20 px off the window edge. The margin goes on the footer's
+    /// scroll viewer, which sits in an Auto row: margin on an item inside it would only make the list scroll.
+    /// </summary>
+    private void LiftFooter()
+    {
+        if (FindByName(NavView, "FooterItemsScrollViewer") is FrameworkElement host)
+            host.Margin = new Thickness(0, 0, 0, 20);
+        else if (NavView.Visibility == Visibility.Visible)
+            Logger.Log("Sidebar footer host not found; footer keeps the default position.");
+    }
+
+    private static FrameworkElement? FindByName(DependencyObject root, string name)
+    {
+        int n = VisualTreeHelper.GetChildrenCount(root);
+        for (int i = 0; i < n; i++)
+        {
+            var c = VisualTreeHelper.GetChild(root, i);
+            if (c is FrameworkElement fe && fe.Name == name) return fe;
+            if (FindByName(c, name) is FrameworkElement hit) return hit;
+        }
+        return null;
+    }
 
     // ───────────────────────────────────────────── Start screen and modules
 
@@ -130,10 +165,17 @@ public sealed partial class MainWindow : Window
             "about" => NavAbout,
             _ => NavAnalyzer,
         };
-        if (tag == "settings") NavView.SelectedItem = NavView.SettingsItem;
+        // Show the shell first: while it is collapsed the NavigationView has no template, so it has no Settings item yet.
+        HideStart();
+        if (tag == "settings")
+        {
+            NavView.UpdateLayout();
+            LiftFooter();
+            if (NavView.SettingsItem is not null) NavView.SelectedItem = NavView.SettingsItem;
+            else Navigate("settings");
+        }
         else if (!ReferenceEquals(NavView.SelectedItem, item)) NavView.SelectedItem = item;
         else Navigate(tag);
-        HideStart();
     }
 
     public void ShowStart()
@@ -153,6 +195,8 @@ public sealed partial class MainWindow : Window
         _onStart = false;
         NavView.Visibility = Visibility.Visible;
         SidebarToggle.Visibility = Visibility.Visible;
+        NavView.UpdateLayout();
+        LiftFooter();
         SyncSidebarUi();
         var sb = new Storyboard();
         var fade = new DoubleAnimation { To = 0, Duration = TimeSpan.FromMilliseconds(260) };
@@ -219,7 +263,6 @@ public sealed partial class MainWindow : Window
         bool open = NavView.IsPaneOpen;
         SidebarGlyph.Glyph = open ? "" : ""; // ClosePane : OpenPane
         ToolTipService.SetToolTip(SidebarToggle, open ? "Hide sidebar (Ctrl+B)" : "Show sidebar (Ctrl+B)");
-        ThemeRow.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void SidebarToggle_Click(object sender, RoutedEventArgs e) => ToggleSidebar();
@@ -277,7 +320,7 @@ public sealed partial class MainWindow : Window
                 });
                 return true;
             case Shortcuts.About: OpenModule("about"); return true;
-            case Shortcuts.Theme: SwitchTheme(IsDark ? "Light" : "Dark", _onStart ? null : CenterOf(ThemeToggle)); return true;
+            case Shortcuts.Theme: SwitchTheme(IsDark ? "Light" : "Dark", _onStart ? null : ThemeOrigin()); return true;
             case Shortcuts.PlayPause: player.Toggle(); return true;
             case Shortcuts.Next: player.Next(); return true;
             case Shortcuts.Previous: player.Previous(); return true;

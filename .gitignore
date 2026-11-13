@@ -52,3 +52,10 @@ Super kHz.txt
 # Reference images from icon banks (licence not checked) - local only
 docs/referencias-icone/
 tools/shots/
+
+# Internal working documents: kept on disk, never published
+docs/handoff/
+kHz_Analyzer_Master_Specification.md
+f2_results.txt
+**/f2_results.txt
+
