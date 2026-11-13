@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Microsoft.UI;
 using Microsoft.UI.Input;
@@ -47,25 +47,52 @@ public sealed class Scrubber : Grid
         _track.Background = new SolidColorBrush(Color.FromArgb(0x38, 0xFF, 0xFF, 0xFF));
         _fill.Background = new SolidColorBrush(Red);
 
-        // Water drop: red body, darker rim, bright specular dot and a soft cast shadow.
-        var shadow = new Ellipse { Width = 16, Height = 16, Fill = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0)), Margin = new Thickness(0, 3, 0, -3) };
-        var body = new Ellipse
+        // Water drop: a soft contact shadow under a glass bead. The old thumb was a flat red ball with a
+        // white dot stuck on it, lit from straight above, which matched nothing else on screen.
+        var shadow = new Ellipse
         {
-            Width = 16, Height = 16, StrokeThickness = 1.5,
-            Stroke = new SolidColorBrush(Color.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
+            Width = 14, Height = 14, Margin = new Thickness(1, 4, 1, -4),
             Fill = new RadialGradientBrush
             {
-                Center = new Point(0.38, 0.32), GradientOrigin = new Point(0.32, 0.26), RadiusX = 0.75, RadiusY = 0.75,
                 GradientStops =
                 {
-                    new GradientStop { Color = Color.FromArgb(255, 0xFF, 0xC2, 0xCB), Offset = 0 },
-                    new GradientStop { Color = Color.FromArgb(255, 0xFF, 0x4D, 0x63), Offset = 0.45 },
-                    new GradientStop { Color = Color.FromArgb(255, 0xD3, 0x12, 0x2B), Offset = 1 },
+                    new GradientStop { Color = Color.FromArgb(0x4D, 0, 0, 0), Offset = 0 },
+                    new GradientStop { Color = Color.FromArgb(0x26, 0, 0, 0), Offset = 0.6 },
+                    new GradientStop { Color = Color.FromArgb(0, 0, 0, 0), Offset = 1 },
                 },
             },
         };
-        var spec = new Ellipse { Width = 5, Height = 4, Fill = new SolidColorBrush(Color.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(4, 3, 0, 0) };
-        _thumb.Children.Add(shadow); _thumb.Children.Add(body); _thumb.Children.Add(spec);
+        // The bead itself, painted to the same model the glass surfaces are baked from: key light from
+        // the upper left, a cool rim where that light grazes the edge, and a warm bounce coming back off
+        // the red track on the lower right. The old thumb was lit from straight above, which matched
+        // nothing else on screen and read as a sticker.
+        var bead = new Ellipse
+        {
+            Width = 16, Height = 16, StrokeThickness = 1,
+            Stroke = new LinearGradientBrush
+            {
+                StartPoint = new Point(0.2, 0), EndPoint = new Point(0.8, 1),
+                GradientStops =
+                {
+                    new GradientStop { Color = Color.FromArgb(0xF2, 0xFF, 0xFF, 0xFF), Offset = 0 },
+                    new GradientStop { Color = Color.FromArgb(0x59, 0xFF, 0xFF, 0xFF), Offset = 0.45 },
+                    new GradientStop { Color = Color.FromArgb(0xCC, 0xFF, 0x8A, 0x9B), Offset = 1 },
+                },
+            },
+            Fill = new RadialGradientBrush
+            {
+                Center = new Point(0.36, 0.30), GradientOrigin = new Point(0.30, 0.24), RadiusX = 0.85, RadiusY = 0.85,
+                GradientStops =
+                {
+                    new GradientStop { Color = Color.FromArgb(0xF2, 0xFF, 0xFF, 0xFF), Offset = 0 },
+                    new GradientStop { Color = Color.FromArgb(0x8C, 0xFF, 0xE6, 0xEA), Offset = 0.32 },
+                    new GradientStop { Color = Color.FromArgb(0x73, 0xFA, 0x24, 0x3C), Offset = 0.78 },
+                    new GradientStop { Color = Color.FromArgb(0xB3, 0xD3, 0x12, 0x2B), Offset = 1 },
+                },
+            },
+        };
+        _thumb.Children.Add(shadow);
+        _thumb.Children.Add(bead);
 
         Children.Add(_track); Children.Add(_fill); Children.Add(_thumb);
         SizeChanged += (_, _) => Arrange();
