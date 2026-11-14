@@ -32,7 +32,7 @@ public sealed class SpectrumView : Grid
     private readonly Random _rnd = new(7);
     private double _t;
 
-    public int BarCount { get; set; } = 64;
+    public int BarCount { get; set; } = 96;
     public double MaxHz { get; set; } = 22050;
     public double CutoffHz { get; set; } = 16229;
     public double MarkerHz { get; set; } = 20000;
@@ -101,7 +101,7 @@ public sealed class SpectrumView : Grid
         _h = new double[BarCount];
         for (int i = 0; i < BarCount; i++)
         {
-            var r = new Rectangle { RadiusX = 1.5, RadiusY = 1.5, Fill = new SolidColorBrush(SpecColor((double)i / Math.Max(1, BarCount - 1))) };
+            var r = new Rectangle { RadiusX = 1, RadiusY = 1, Fill = new SolidColorBrush(SpecColor((double)i / Math.Max(1, BarCount - 1))) };
             _bars.Add(r); _canvas.Children.Add(r);
             _h[i] = 0.05;
         }
@@ -129,7 +129,7 @@ public sealed class SpectrumView : Grid
     {
         double w = _canvas.ActualWidth, h = _canvas.ActualHeight;
         if (w <= 0 || h <= 0 || _bars.Count == 0) return;
-        double slot = w / _bars.Count, bw = Math.Max(1.5, slot * 0.62);
+        double slot = w / _bars.Count, bw = Math.Clamp(slot * 0.5, 1.5, 2.0);
         for (int i = 0; i < _bars.Count; i++)
         {
             double bh = Math.Max(2, _h[i] * (h - 16));

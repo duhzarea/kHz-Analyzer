@@ -83,6 +83,7 @@
             <SolidColorBrush x:Key="BorderSubtleBrush" Color="#1A0F172A" />
             <LinearGradientBrush x:Key="SpectrumBrush" StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF0E7490" Offset="0.00" /><GradientStop Color="#FF15803D" Offset="0.25" /><GradientStop Color="#FFA16207" Offset="0.50" /><GradientStop Color="#FFFA243C" Offset="0.75" /><GradientStop Color="#FFB91C1C" Offset="1.00" /></LinearGradientBrush>
             <LinearGradientBrush x:Key="GlassGradientBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#9EFFFFFF" Offset="0" /><GradientStop Color="#66FFFFFF" Offset="1" /></LinearGradientBrush>
+            <LinearGradientBrush x:Key="DeckBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#F7FFFFFF" Offset="0" /><GradientStop Color="#E8EDF1F7" Offset="1" /></LinearGradientBrush>
             <!-- Bevel: key light from the upper left, structural line through the middle, warm bounce
                  off the brand red at the lower right. Same model the hub tiles and the switch share. -->
             <LinearGradientBrush x:Key="BevelRimBrush" StartPoint="0.12,0" EndPoint="0.88,1"><GradientStop Color="#F2FFFFFF" Offset="0" /><GradientStop Color="#4DA9C4DE" Offset="0.3" /><GradientStop Color="#420F172A" Offset="0.6" /><GradientStop Color="#8CFA243C" Offset="1" /></LinearGradientBrush>
@@ -201,6 +202,7 @@
             <SolidColorBrush x:Key="BorderSubtleBrush" Color="#14FFFFFF" />
             <LinearGradientBrush x:Key="SpectrumBrush" StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF22D3EE" Offset="0.00" /><GradientStop Color="#FF4ADE80" Offset="0.25" /><GradientStop Color="#FFFACC15" Offset="0.50" /><GradientStop Color="#FFFB923C" Offset="0.75" /><GradientStop Color="#FFEF4444" Offset="1.00" /></LinearGradientBrush>
             <LinearGradientBrush x:Key="GlassGradientBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#A6111827" Offset="0" /><GradientStop Color="#800D111C" Offset="1" /></LinearGradientBrush>
+            <LinearGradientBrush x:Key="DeckBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#EB111827" Offset="0" /><GradientStop Color="#E00A0D13" Offset="1" /></LinearGradientBrush>
             <LinearGradientBrush x:Key="BevelRimBrush" StartPoint="0.12,0" EndPoint="0.88,1"><GradientStop Color="#F2FFFFFF" Offset="0" /><GradientStop Color="#4DFFFFFF" Offset="0.32" /><GradientStop Color="#14FFFFFF" Offset="0.6" /><GradientStop Color="#B3FF8A9B" Offset="1" /></LinearGradientBrush>
             <LinearGradientBrush x:Key="BevelInnerBrush" StartPoint="0.5,0" EndPoint="0.5,1"><GradientStop Color="#00000000" Offset="0" /><GradientStop Color="#380A0C11" Offset="1" /></LinearGradientBrush>
             <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FFFF3B52" />
@@ -316,6 +318,7 @@
             <SolidColorBrush x:Key="BorderSubtleBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="SpectrumBrush" Color="{ThemeResource SystemColorHighlightColor}" />
             <SolidColorBrush x:Key="GlassGradientBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="DeckBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="BevelRimBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="BevelInnerBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="PopupSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />

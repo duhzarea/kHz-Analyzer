@@ -45,7 +45,7 @@ public static class Shortcuts
 
         new(Browse, "Analyzer", "Choose a folder", VirtualKey.O, Ctrl: true),
         new(Analyze, "Analyzer", "Analyze the folder", VirtualKey.F5),
-        new(Cancel, "Analyzer", "Cancel the analysis", VirtualKey.Escape, Display: "Esc"),
+        new(Cancel, "Analyzer", "Cancel the running task", VirtualKey.Escape, Display: "Esc"),
         new(Export, "Analyzer", "Export .docx and .csv reports", VirtualKey.E, Ctrl: true),
         new(Search, "Analyzer", "Search tracks", VirtualKey.F, Ctrl: true),
         new(TrackInfo, "Analyzer", "Track information", VirtualKey.I, Ctrl: true),

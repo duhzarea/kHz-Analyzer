@@ -64,7 +64,7 @@ public sealed partial class DownloadPage : Page
         SetBusy(true);
         Progress.IsIndeterminate = true;
         LogText.Text = "Reading the link…";
-        _cts = new CancellationTokenSource();
+        _cts = TaskRegistry.Track(new CancellationTokenSource());
         try
         {
             await CarregarInfoAsync(url, _cts.Token);
@@ -83,7 +83,7 @@ public sealed partial class DownloadPage : Page
         {
             Progress.IsIndeterminate = false;
             SetBusy(false);
-            _cts.Dispose();
+            TaskRegistry.Release(_cts);
             _cts = null;
         }
     }
@@ -138,7 +138,7 @@ public sealed partial class DownloadPage : Page
         Progress.Value = 0;
         Progress.IsIndeterminate = true;
         PercentText.Text = "";
-        _cts = new CancellationTokenSource();
+        _cts = TaskRegistry.Track(new CancellationTokenSource());
         try
         {
             // Download pressed without "Get info" first, or the link changed since.
@@ -213,7 +213,7 @@ public sealed partial class DownloadPage : Page
         {
             Progress.IsIndeterminate = false;
             SetBusy(false);
-            _cts.Dispose();
+            TaskRegistry.Release(_cts);
             _cts = null;
         }
     }

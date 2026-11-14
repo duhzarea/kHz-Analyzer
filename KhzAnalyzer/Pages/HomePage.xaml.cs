@@ -87,7 +87,7 @@ public sealed partial class HomePage : Page, IShortcutTarget
         _resultadosRaw.Clear();
         AtualizarContadores();
 
-        _cts = new CancellationTokenSource();
+        _cts = TaskRegistry.Track(new CancellationTokenSource());
         AnalisarButton.IsEnabled = false;
         ProcurarButton.IsEnabled = false;
         CancelarButton.IsEnabled = true;
@@ -111,7 +111,7 @@ public sealed partial class HomePage : Page, IShortcutTarget
             ProcurarButton.IsEnabled = true;
             CancelarButton.IsEnabled = false;
             ExportarButton.IsEnabled = _resultadosRaw.Count > 0;
-            _cts?.Dispose();
+            TaskRegistry.Release(_cts);
             _cts = null;
         }
     }

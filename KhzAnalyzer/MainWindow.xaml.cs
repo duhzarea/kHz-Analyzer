@@ -326,6 +326,8 @@ public sealed partial class MainWindow : Window
             case Shortcuts.Previous: player.Previous(); return true;
             case Shortcuts.SeekForward: player.SeekBy(10); return true;
             case Shortcuts.SeekBack: player.SeekBy(-10); return true;
+            // Esc stops whatever is running, from any screen. Falls through when nothing is.
+            case Shortcuts.Cancel when TaskRegistry.CancelAll(): return true;
         }
         // Analyzer actions: open the Analyzer first if needed.
         if (id is Shortcuts.Browse or Shortcuts.Analyze or Shortcuts.Export or Shortcuts.Search or Shortcuts.TrackInfo or Shortcuts.Remove or Shortcuts.Cancel)

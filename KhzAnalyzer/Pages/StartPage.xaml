@@ -97,9 +97,8 @@
                     </Border.Triggers>
                     <Border
                         Padding="24,22"
-                        Background="{StaticResource DeckBrush}"
-                        CornerRadius="24.5"
-                        RequestedTheme="Dark">
+                        Background="{ThemeResource DeckBrush}"
+                        CornerRadius="24.5">
                         <Grid RowSpacing="14">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -112,14 +111,14 @@
                                         CharacterSpacing="160"
                                         FontFamily="{StaticResource MonoFontFamily}"
                                         FontSize="12"
-                                        Foreground="#B3FFFFFF"
+                                        Foreground="{ThemeResource InkMutedBrush}"
                                         Text="LIVE SPECTRUM" />
                                     <TextBlock FontFamily="{StaticResource MonoFontFamily}" FontSize="14">
-                                        <Run Foreground="#B3FFFFFF" Text="Max freq. " />
+                                        <Run Foreground="{ThemeResource InkMutedBrush}" Text="Max freq. " />
                                         <Run
                                             x:Name="MaxFreqRun"
                                             FontWeight="SemiBold"
-                                            Foreground="White"
+                                            Foreground="{ThemeResource InkBrush}"
                                             Text="21,480 Hz" />
                                     </TextBlock>
                                 </StackPanel>

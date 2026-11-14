@@ -45,7 +45,7 @@
 
             <Border
                 Padding="20,18,20,16"
-                Background="{StaticResource DeckBrush}"
+                Background="{ThemeResource DeckBrush}"
                 CornerRadius="22.5">
                 <Grid RowSpacing="0">
                     <Grid.RowDefinitions>
@@ -67,7 +67,7 @@
                             x:Name="TitleText"
                             FontFamily="{StaticResource InterSemiBoldFontFamily}"
                             FontSize="17"
-                            Foreground="White"
+                            Foreground="{ThemeResource InkBrush}"
                             Text="Nothing playing"
                             TextTrimming="CharacterEllipsis" />
                         <ToggleButton
@@ -80,7 +80,7 @@
                             BorderThickness="0"
                             Click="RepeatButton_Click"
                             CornerRadius="8"
-                            Foreground="#B3FFFFFF"
+                            Foreground="{ThemeResource InkMutedBrush}"
                             ToolTipService.ToolTip="Repeat this track">
                             <FontIcon FontSize="14" Glyph="&#xE8EE;" />
                         </ToggleButton>
@@ -92,7 +92,7 @@
                         Margin="0,3,0,0"
                         FontFamily="{StaticResource MonoFontFamily}"
                         FontSize="11"
-                        Foreground="#A6FFFFFF"
+                        Foreground="{ThemeResource InkFaintBrush}"
                         Text="Double-click a track, or press Space"
                         TextTrimming="CharacterEllipsis" />
 
@@ -112,14 +112,14 @@
                             x:Name="ElapsedText"
                             FontFamily="{StaticResource MonoFontFamily}"
                             FontSize="11"
-                            Foreground="#B3FFFFFF"
+                            Foreground="{ThemeResource InkMutedBrush}"
                             Text="00:00" />
                         <TextBlock
                             x:Name="RemainingText"
                             HorizontalAlignment="Right"
                             FontFamily="{StaticResource MonoFontFamily}"
                             FontSize="11"
-                            Foreground="#B3FFFFFF"
+                            Foreground="{ThemeResource InkMutedBrush}"
                             Text="-00:00" />
                     </Grid>
 
@@ -177,7 +177,7 @@
                         <FontIcon
                             x:Name="VolumeGlyph"
                             FontSize="13"
-                            Foreground="#A6FFFFFF"
+                            Foreground="{ThemeResource InkFaintBrush}"
                             Glyph="&#xE995;" />
                         <Slider
                             x:Name="VolumeSlider"

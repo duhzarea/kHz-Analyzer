@@ -14,7 +14,6 @@
     <LinearGradientBrush x:Key="DomeBodyBrush" StartPoint="0.5,0" EndPoint="0.5,1"><GradientStop Color="#F21F2937" Offset="0" /><GradientStop Color="#F20A0D13" Offset="1" /></LinearGradientBrush>
     <RadialGradientBrush x:Key="DomeHighlightBrush" Center="0.3,0.2" GradientOrigin="0.3,0.2" RadiusX="0.7" RadiusY="0.7"><GradientStop Color="#40FFFFFF" Offset="0" /><GradientStop Color="#00FFFFFF" Offset="0.8" /></RadialGradientBrush>
     <RadialGradientBrush x:Key="DomeCastBrush"><GradientStop Color="#73000000" Offset="0" /><GradientStop Color="#00000000" Offset="1" /></RadialGradientBrush>
-    <LinearGradientBrush x:Key="DeckBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#EB111827" Offset="0" /><GradientStop Color="#E00A0D13" Offset="1" /></LinearGradientBrush>
     <LinearGradientBrush x:Key="DeckSpectrumBrush" StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF22D3EE" Offset="0" /><GradientStop Color="#FFFACC15" Offset="0.5" /><GradientStop Color="#FFFA243C" Offset="1" /></LinearGradientBrush>
 
     <!-- ───── Primary: ember fill, sheen, glow and floating points ───── -->

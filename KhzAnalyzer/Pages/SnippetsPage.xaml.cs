@@ -135,7 +135,7 @@ public sealed partial class SnippetsPage : Page
         Progress.IsIndeterminate = true;
         Progress.Value = 0;
         StatusText.Text = "Looking for tracks without a snippet…";
-        _cts = new CancellationTokenSource();
+        _cts = TaskRegistry.Track(new CancellationTokenSource());
 
         var progresso = new Progress<SnippetProgress>(p =>
         {
@@ -179,7 +179,7 @@ public sealed partial class SnippetsPage : Page
         {
             Progress.IsIndeterminate = false;
             _busy = false;
-            _cts.Dispose();
+            TaskRegistry.Release(_cts);
             _cts = null;
             UpdateButtons();
         }
