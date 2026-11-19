@@ -70,6 +70,64 @@ public sealed partial class HomePage : Page, IShortcutTarget
         }
     }
 
+    // --------------------------------------------------------- Dropzone --
+
+    private void DropZone_PointerEntered(object sender, PointerRoutedEventArgs e) =>
+        DropBorder.Stroke = (Brush)Application.Current.Resources["BrandBrush"];
+
+    private void DropZone_PointerExited(object sender, PointerRoutedEventArgs e) =>
+        DropBorder.Stroke = (Brush)Application.Current.Resources["BorderSubtleBrush"];
+
+    private void DropZone_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+        e.DragUIOverride.Caption = "Open the full spectrogram";
+        e.DragUIOverride.IsGlyphVisible = true;
+        DropBorder.Stroke = (Brush)Application.Current.Resources["BrandBrush"];
+    }
+
+    private async void DropZone_Drop(object sender, DragEventArgs e)
+    {
+        DropBorder.Stroke = (Brush)Application.Current.Resources["BorderSubtleBrush"];
+        if (!e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems)) return;
+
+        var items = await e.DataView.GetStorageItemsAsync();
+        foreach (var item in items)
+        {
+            if (item is Windows.Storage.StorageFile file && SpectrogramDialog.Handles(file.Path))
+            {
+                await OpenSpectrogramAsync(file.Path);
+                return;
+            }
+        }
+        StatusText.Text = "That file type is not supported here. Drop a WAV, AIFF, FLAC, MP3 or M4A.";
+    }
+
+    private async void DropZone_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new Microsoft.Windows.Storage.Pickers.FileOpenPicker(
+                XamlRoot.ContentIslandEnvironment.AppWindowId);
+            foreach (string ext in SpectrogramDialog.Extensions) picker.FileTypeFilter.Add(ext);
+
+            var picked = await picker.PickSingleFileAsync();
+            if (picked is not null && !string.IsNullOrWhiteSpace(picked.Path))
+                await OpenSpectrogramAsync(picked.Path);
+        }
+        catch (Exception ex)
+        {
+            StatusText.Text = $"Could not open the file picker ({ex.Message}).";
+        }
+    }
+
+    private async Task OpenSpectrogramAsync(string path)
+    {
+        DropText.Text = $"Reading {Path.GetFileName(path)}…";
+        try { await SpectrogramDialog.ShowAsync(XamlRoot, path); }
+        finally { DropText.Text = "Click to choose or drag & drop local file"; }
+    }
+
     // ---------------------------------------------------------- Análise --
 
     private async void AnalisarButton_Click(object sender, RoutedEventArgs e)

@@ -70,9 +70,9 @@
         </StackPanel>
 
         <!--  Folder + actions  -->
+        <StackPanel Grid.Row="1" Spacing="12">
         <Grid
             x:Name="Actions"
-            Grid.Row="1"
             ColumnSpacing="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -151,6 +151,50 @@
                 </StackPanel>
             </Button>
         </Grid>
+
+            <!--  Single file: drop it here and the full spectrogram opens  -->
+            <Grid
+                x:Name="DropZone"
+                Height="88"
+                AllowDrop="True"
+                Background="Transparent"
+                DragOver="DropZone_DragOver"
+                Drop="DropZone_Drop"
+                PointerEntered="DropZone_PointerEntered"
+                PointerExited="DropZone_PointerExited"
+                Tapped="DropZone_Tapped">
+                <Rectangle
+                    x:Name="DropBorder"
+                    RadiusX="16"
+                    RadiusY="16"
+                    Fill="{ThemeResource GlassGradientBrush}"
+                    Stroke="{ThemeResource BorderSubtleBrush}"
+                    StrokeDashArray="5,4"
+                    StrokeThickness="1.5" />
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="12">
+                    <FontIcon
+                        FontSize="20"
+                        Foreground="{ThemeResource InkFaintBrush}"
+                        Glyph="&#xE8D6;" />
+                    <StackPanel>
+                        <TextBlock
+                            x:Name="DropText"
+                            FontSize="14"
+                            Foreground="{ThemeResource InkMutedBrush}"
+                            Text="Click to choose or drag &amp; drop local file" />
+                        <TextBlock
+                            FontFamily="{StaticResource MonoFontFamily}"
+                            FontSize="11"
+                            Foreground="{ThemeResource InkFaintBrush}"
+                            Text="WAV · AIFF · FLAC · MP3 · M4A" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
 
         <!--  Stat cards  -->
         <Grid
